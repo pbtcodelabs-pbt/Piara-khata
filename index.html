@@ -1012,8 +1012,51 @@ select {
         <div style="font-size:11px;font-weight:900;color:#92400e;margin-bottom:4px">🧪 Beta Version — یہ ایپ ابھی ٹیسٹنگ کے مرحلے میں ہے</div>
         <div style="font-size:10.5px;color:#78350f;line-height:1.6;font-weight:600">
           آپ کی بہترین رائے کے ساتھ اسے مسلسل بہتر بنایا جا رہا ہے۔ روزانہ فائلوں کا بیک اپ لیں۔<br>
-          مسئلہ یا مشورہ ہو تو نیچے 💬 بٹن سے ڈیویلپر کو فوری اطلاع دیں۔
+          مسئلہ یا مشورہ ہو تو نیچے ڈیویلپر کو فوری اطلاع دیں۔
         </div>
+      </div>
+      <!-- PULSING ANIMATION CSS -->
+      <style>
+        @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.7), 0 4px 12px rgba(0,0,0,0.15); } 50% { box-shadow: 0 0 0 8px rgba(255,255,255,0), 0 4px 12px rgba(0,0,0,0.25); } }
+        @keyframes pulse-scale { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+        @keyframes highlight-pulse { 0%, 100% { box-shadow: 0 0 10px 3px rgba(239,68,68,0.6); } 50% { box-shadow: 0 0 20px 6px rgba(239,68,68,0.9); } }
+        .dev-contact-btn { animation: pulse-glow 2.5s infinite, pulse-scale 2.5s infinite; }
+      </style>
+      
+      <!-- DEVELOPER CONTACT BUTTONS - 3D PROFESSIONAL STYLE -->
+      <div style="margin-top:12px;display:flex;gap:10px;justify-content:center">
+        <!-- WhatsApp Button -->
+        <button type="button" onclick="openDevWA()" class="dev-contact-btn" style="flex:1;background:linear-gradient(135deg,#25D366 0%,#20BA58 100%);color:#fff;border:none;padding:14px 12px;border-radius:14px;font-weight:900;font-size:13px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 15px rgba(37,211,102,0.4);transition:all 0.3s ease;position:relative;overflow:hidden">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 48 48" style="filter:drop-shadow(0 2px 2px rgba(0,0,0,0.2))">
+            <defs><radialGradient id="wa-grad" cx="50%" cy="50%" r="50%"><stop offset="0%" style="stop-color:#fff;stop-opacity:0.3"/><stop offset="100%" style="stop-color:#000;stop-opacity:0.1"/></radialGradient></defs>
+            <circle cx="24" cy="24" r="22" fill="url(#wa-grad)"/>
+            <path d="M24 8C15.16 8 8 15.16 8 24c0 2.84.74 5.5 2.04 7.82L8 40l8.42-2.02A15.94 15.94 0 0 0 24 40c8.84 0 16-7.16 16-16S32.84 8 24 8zm8.1 21.9c-.34.96-1.96 1.84-2.72 1.96-.7.1-1.58.14-2.54-.16a23.4 23.4 0 0 1-2.3-.86c-4.06-1.76-6.7-5.84-6.9-6.1-.2-.26-1.6-2.12-1.6-4.06 0-1.92 1-2.86 1.36-3.26.34-.38.74-.48 1-.48.24 0 .48 0 .7.02.22.02.52-.08.82.62.3.72 1.04 2.5 1.14 2.68.1.18.16.4.04.64-.14.26-.2.4-.4.62-.2.22-.42.5-.6.66-.2.2-.4.4-.18.78.22.38.98 1.62 2.1 2.62 1.44 1.28 2.64 1.68 3.02 1.88.38.2.6.16.82-.1.22-.28.96-1.12 1.22-1.5.26-.38.52-.32.88-.18.36.14 2.28 1.08 2.66 1.28.38.2.64.3.74.46.1.18.1 1.02-.24 1.98z" fill="#fff"/>
+          </svg>
+          WhatsApp
+        </button>
+        
+        <!-- Gmail Button -->
+        <button type="button" onclick="openDevMail()" class="dev-contact-btn" style="flex:1;background:linear-gradient(135deg,#EA4335 0%,#D33426 100%);color:#fff;border:none;padding:14px 12px;border-radius:14px;font-weight:900;font-size:13px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 15px rgba(234,67,53,0.4);transition:all 0.3s ease;position:relative;overflow:hidden">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 48 48" style="filter:drop-shadow(0 2px 2px rgba(0,0,0,0.2))">
+            <defs><radialGradient id="mail-grad" cx="50%" cy="50%" r="50%"><stop offset="0%" style="stop-color:#fff;stop-opacity:0.3"/><stop offset="100%" style="stop-color:#000;stop-opacity:0.1"/></radialGradient></defs>
+            <rect width="48" height="48" rx="8" fill="url(#mail-grad)"/>
+            <path d="M8 14l16 11L40 14M8 14h32v22H8z" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 1px 1px rgba(0,0,0,0.2))"/>
+          </svg>
+          Gmail
+        </button>
+        
+        <!-- SMS Button -->
+        <button type="button" onclick="openDevSMS()" class="dev-contact-btn" style="flex:1;background:linear-gradient(135deg,#0ea5e9 0%,#0284c7 100%);color:#fff;border:none;padding:14px 12px;border-radius:14px;font-weight:900;font-size:13px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 15px rgba(14,165,233,0.4);transition:all 0.3s ease;position:relative;overflow:hidden">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 48 48" style="filter:drop-shadow(0 2px 2px rgba(0,0,0,0.2))">
+            <defs><radialGradient id="sms-grad" cx="50%" cy="50%" r="50%"><stop offset="0%" style="stop-color:#fff;stop-opacity:0.3"/><stop offset="100%" style="stop-color:#000;stop-opacity:0.1"/></radialGradient></defs>
+            <rect width="48" height="48" rx="8" fill="url(#sms-grad)"/>
+            <path d="M8 12h32c2.2 0 4 1.8 4 4v20c0 2.2-1.8 4-4 4H8c-2.2 0-4-1.8-4-4V16c0-2.2 1.8-4 4-4z" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="14" cy="28" r="2" fill="#fff"/>
+            <circle cx="24" cy="28" r="2" fill="#fff"/>
+            <circle cx="34" cy="28" r="2" fill="#fff"/>
+          </svg>
+          SMS
+        </button>
       </div>
     </div>
   </div>
@@ -1855,18 +1898,77 @@ function _devChatMessage(){
 function openDevWA(){
   var c = _devContact();
   if(!c.wa){ alert('⚠️ Developer WhatsApp number is not set. Set it in Admin Panel > 💬 Developer tab.'); return; }
-  window.open('https://wa.me/'+c.wa+'?text='+encodeURIComponent(_devChatMessage()),'_blank');
+  
+  var msg = encodeURIComponent(_devChatMessage());
+  var phone = c.wa.replace(/[^0-9]/g,'');
+  var waUrl = 'https://wa.me/'+phone+'?text='+msg;
+  var waProtocol = 'whatsapp://send?phone='+phone+'&text='+msg;
+  
+  // پہلے WhatsApp/Business protocol کو try کریں
+  var waAttempted = false;
+  
+  try {
+    // پہلی کوشش
+    window.location.href = waProtocol;
+    waAttempted = true;
+    
+    // 1.5 سیکنڈ بعد check کریں - اگر نہیں کھلا تو web version
+    setTimeout(function(){
+      window.open(waUrl, '_blank');
+    }, 1500);
+    
+    // 3 سیکنڈ بعد اگر ابھی بھی نہیں کھلا تو SMS fallback
+    setTimeout(function(){
+      // اگر page ابھی active ہے تو WhatsApp نہیں کھلا
+      if(document.hasFocus && document.hasFocus()){
+        showWAFailureAndSwitchToSMS();
+      }
+    }, 3000);
+    
+  } catch(e) {
+    // Error آئے تو سیدھا SMS پر جائیں
+    showWAFailureAndSwitchToSMS();
+  }
 }
+
+// جب WhatsApp fail ہو تو یہ function چلے
+function showWAFailureAndSwitchToSMS(){
+  // SMS بٹن کو highlight کریں
+  var smsBtn = document.querySelector('[onclick="openDevSMS()"]');
+  if(smsBtn){
+    smsBtn.style.animation = 'highlight-pulse 0.6s ease-in-out';
+    smsBtn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+    smsBtn.style.transform = 'scale(1.08)';
+    
+    // 3 سیکنڈ بعد wapas normal کریں
+    setTimeout(function(){
+      smsBtn.style.animation = '';
+      smsBtn.style.background = 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)';
+      smsBtn.style.transform = 'scale(1)';
+    }, 3000);
+  }
+  
+  // Message دکھائیں
+  alert('⚠️ WhatsApp available نہیں ہے۔\n\n💬 براہ کرم SMS کریں!');
+  
+  // SMS بٹن کو scroll کریں اور highlight کریں
+  if(smsBtn){
+    smsBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
 function openDevMail(){
   var c = _devContact();
   if(!c.email){ alert('⚠️ Developer email is not set. Set it in Admin Panel > 💬 Developer tab.'); return; }
   var subject = _isLoginScreen() ? 'Activation Code Request' : 'Piara Khata - Support / Suggestion';
   window.location.href = 'mailto:'+c.email+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(_devChatMessage());
 }
+
 function openDevSMS(){
   var c = _devContact();
   if(!c.sms){ alert('⚠️ Developer SMS number is not set. Set it in Admin Panel > 💬 Developer tab.'); return; }
-  window.location.href = 'sms:'+c.sms+'?body='+encodeURIComponent(_devChatMessage());
+  var smsUrl = 'sms:'+c.sms+'?body='+encodeURIComponent(_devChatMessage());
+  window.location.href = smsUrl;
 }
 
 // ============================================================
