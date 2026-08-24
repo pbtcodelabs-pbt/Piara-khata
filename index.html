@@ -989,7 +989,7 @@ select {
     <span id="pk-net-dot"></span>
     <span id="pk-net-text">Online</span>
   </div>
-  <div id="pk-app-version">PK002</div>
+  <div id="pk-app-version">PK248MO0335PM</div>
 </div>
 
 <!-- DEVELOPER CHAT BUBBLE (global — visible on login page + main app) -->
@@ -4500,7 +4500,17 @@ function admToast(msg){
 
 // ════ SOURCE CODE DOWNLOAD ════
 function admDownloadSourceCode(){
-  const h = document.documentElement.outerHTML;
+  // Build a clean copy of the page for export: any panel/modal that happens to be
+  // open right now (Admin Panel, PIN modal, etc.) must NOT be baked into the file
+  // as "open" — otherwise every future copy of this file boots straight into that
+  // panel instead of the normal Piara Khata home screen.
+  const clone = document.documentElement.cloneNode(true);
+  const forceClosedIds = ['adm-panel','adm-pin-modal'];
+  forceClosedIds.forEach(function(id){
+    const el = clone.querySelector('#'+id);
+    if(el) el.style.display = 'none';
+  });
+  const h = clone.outerHTML;
   const d = new Date();
   const dayAbbrevs = ['SU','MO','TU','WE','TH','FR','SA'];
   const f = 'PKT' + d.getDate() + (d.getMonth()+1) + dayAbbrevs[d.getDay()] + 
@@ -5351,7 +5361,7 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
 </div>
 
 <!-- Full Admin Panel -->
-<div id="adm-panel" style="display: block;">
+<div id="adm-panel" style="display: none;">
   <!-- Top bar -->
   <div id="adm-topbar">
     <button onclick="closeAdminPanel()" style="background:#1e293b;border:1px solid #334155;color:#94a3b8;width:38px;height:38px;border-radius:10px;font-size:18px;cursor:pointer;flex-shrink:0">✕</button>
@@ -5737,7 +5747,7 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
   updateNetStatus();
 
   // 3) App version tag (shown under the Online/Offline indicator)
-  var PK_APP_VERSION = 'PK002';
+  var PK_APP_VERSION = 'PK248MO0335PM';
   document.addEventListener('DOMContentLoaded', function(){
     var v = document.getElementById('pk-app-version');
     if (v) v.textContent = PK_APP_VERSION;
