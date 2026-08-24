@@ -1891,30 +1891,6 @@ let ncDir = 'got'; // for new customer initial balance direction
 function loadData(){
   try{ records = JSON.parse(localStorage.getItem('easyKhataData')||'[]'); }
   catch{ records = []; }
-  pkRecoverLostCustomers();
-}
-
-// One-time recovery: restores 4 customers whose names/phones/balances were
-// recovered from an old exported snapshot, after a bug wiped local data on
-// this device. Only runs once, and only if the ledger is currently empty —
-// never overwrites real data.
-function pkRecoverLostCustomers(){
-  try{
-    if(localStorage.getItem('pk_recovery_20260824')) return;
-    if(records && records.length>0){ localStorage.setItem('pk_recovery_20260824','skipped-had-data'); return; }
-    const today = new Date().toLocaleDateString('en-GB');
-    const recovered = [
-      {name:'Jg EHSAN JHANGVI',   phone:'03037475475', amount:780},
-      {name:'Jk zohaib Garments', phone:'03138048351', amount:2250},
-      {name:'Htl Shfaat',         phone:'03468763245', amount:10},
-      {name:'Fp Waqas Kryana',    phone:'03036543749', amount:5310}
-    ].map(function(c){
-      return {id:Date.now()+Math.floor(Math.random()*1000), name:c.name, phone:c.phone, type:'got', amount:c.amount, note:'Opening Balance (recovered)', date:today};
-    });
-    records = recovered;
-    saveData();
-    localStorage.setItem('pk_recovery_20260824','applied');
-  }catch(e){ /* never block app load on recovery */ }
 }
 function saveData(){ localStorage.setItem('easyKhataData', JSON.stringify(records)); }
 function fmt(n){ return Number(n||0).toLocaleString('en-US'); }
