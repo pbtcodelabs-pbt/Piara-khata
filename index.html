@@ -25,24 +25,18 @@
 <!-- PWA: Online / Offline status indicator -->
 <style>
 #pk-net-indicator{
-  position:fixed;
-  top:10px;
-  right:12px;
-  z-index:999999;
-  display:flex;
+  display:inline-flex;
   flex-direction:column;
   align-items:center;
-  gap:2px;
-  background:rgba(0,0,0,.45);
-  backdrop-filter:blur(4px);
-  padding:5px 10px;
-  border-radius:14px;
-  font-size:11px;
+  gap:1px;
+  background:rgba(0,0,0,.32);
+  padding:4px 9px;
+  border-radius:12px;
+  font-size:10px;
   font-weight:700;
   color:#fff;
   font-family:sans-serif;
   pointer-events:none;
-  transition:opacity .3s ease;
 }
 #pk-net-row{
   display:flex;
@@ -983,15 +977,6 @@ select {
 </head>
 <body>
 
-<!-- PWA: Online / Offline indicator (top-right, always visible) -->
-<div id="pk-net-indicator" class="pk-online">
-  <div id="pk-net-row">
-    <span id="pk-net-dot"></span>
-    <span id="pk-net-text">Online</span>
-  </div>
-  <div id="pk-app-version">PK248MO0335PM</div>
-</div>
-
 <!-- DEVELOPER CHAT BUBBLE (global — visible on login page + main app) -->
 <div class="dcf-wrap" style="display: flex;">
   <button type="button" class="dcf-bubble" onclick="toggleDevChat()" title="Contact Developer">💬</button>
@@ -1093,6 +1078,14 @@ select {
       <button onclick="showMyAds()" style="background:linear-gradient(135deg,#ffd700,#ff8c00);color:#1a0a00;border:none;border-radius:16px;padding:7px 14px;font-size:13px;font-weight:900;cursor:pointer;display:flex;align-items:center;gap:5px;box-shadow:0 3px 0 #a05a00">
         <span>📢</span><span>My Ads</span>
       </button>
+      <!-- PWA: Online / version indicator — sits in-flow so it never overlaps the title/phone -->
+      <div id="pk-net-indicator" class="pk-online">
+        <div id="pk-net-row">
+          <span id="pk-net-dot"></span>
+          <span id="pk-net-text">Online</span>
+        </div>
+        <div id="pk-app-version">PK248MO0432PM</div>
+      </div>
       <div style="display:flex;gap:5px">
         <button onclick="printAllReport()" style="background:rgba(255,255,255,.25);border:1.5px solid rgba(255,255,255,.5);color:#fff;padding:7px 14px;border-radius:16px;font-size:13px;font-weight:900;cursor:pointer">🖨️ Report</button>
         <button onclick="toggleSettingsMenu()" id="settings-toggle-btn" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);color:#fff;width:30px;height:30px;border-radius:50%;font-size:16px;font-weight:900;cursor:pointer">⚙️</button>
@@ -1117,7 +1110,7 @@ select {
       </div>
     </div>
     <input type="file" id="restore-file" accept=".json" style="display:none" onchange="restoreData(event)">
-  <div id="trial-timer-bar" style="background: linear-gradient(90deg, rgb(30, 58, 138), rgb(37, 99, 235), rgb(29, 78, 216)); color: rgb(255, 255, 255); text-align: center; padding: 2px 10px; font-size: 10px; font-weight: 800; letter-spacing: 0.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">⏳ Free trial ends in: <span style="font-size:14px;letter-spacing:1px">4d 02:28:11</span> left</div></header>
+  </header>
 
   <!-- BETA NOTICE -->
   <div id="beta-notice" class="no-print" style="margin:10px 12px 0 12px;background:#fffbeb;border:1.5px solid #fde68a;border-radius:12px;padding:10px 12px;direction:rtl;position:relative">
@@ -2264,7 +2257,13 @@ let _trialTimerInterval = null;
 function _startTrialTimer(){
   // only for trial users (not activated)
   const activated = localStorage.getItem('ek_act');
-  if(activated === 'YES') return;
+  if(activated === 'YES'){
+    // Defensive cleanup: an old exported copy may still have a frozen trial
+    // bar baked into the HTML — remove it, subscribed users never see it.
+    const stale = document.getElementById('trial-timer-bar');
+    if(stale) stale.remove();
+    return;
+  }
   const encTs = localStorage.getItem('ek_ts');
   if(!encTs) return;
   let startTs = _decodeTime(encTs);
@@ -5747,7 +5746,7 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
   updateNetStatus();
 
   // 3) App version tag (shown under the Online/Offline indicator)
-  var PK_APP_VERSION = 'PK248MO0335PM';
+  var PK_APP_VERSION = 'PK248MO0432PM';
   document.addEventListener('DOMContentLoaded', function(){
     var v = document.getElementById('pk-app-version');
     if (v) v.textContent = PK_APP_VERSION;
