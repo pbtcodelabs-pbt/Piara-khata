@@ -25,18 +25,24 @@
 <!-- PWA: Online / Offline status indicator -->
 <style>
 #pk-net-indicator{
-  display:inline-flex;
+  position:fixed;
+  top:10px;
+  right:12px;
+  z-index:999999;
+  display:flex;
   flex-direction:column;
   align-items:center;
-  gap:1px;
-  background:rgba(0,0,0,.32);
-  padding:4px 9px;
-  border-radius:12px;
-  font-size:10px;
+  gap:2px;
+  background:rgba(0,0,0,.45);
+  backdrop-filter:blur(4px);
+  padding:5px 10px;
+  border-radius:14px;
+  font-size:11px;
   font-weight:700;
   color:#fff;
   font-family:sans-serif;
   pointer-events:none;
+  transition:opacity .3s ease;
 }
 #pk-net-row{
   display:flex;
@@ -974,8 +980,33 @@ select {
 .dcf-menu.open{max-width:220px;opacity:1}
 .dcf-icon{width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 10px rgba(0,0,0,.35);text-decoration:none;font-size:20px;border:none;cursor:pointer}
 </style>
+<!-- Firebase (Piara Khata cloud backup — project: piara-khata-backup, isolated from ffpos/AIO) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<!-- Google Identity Services — used ONLY for direct browser→Google Drive backup (no server, no Blaze plan) -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
+
+<!-- Piara Khata cloud backup — top progress bar (fills right→left, green, then fades) -->
+<div id="pk-backup-bar"></div>
+<style>
+#pk-backup-bar{position:fixed;top:0;right:0;height:4px;width:0%;background:linear-gradient(90deg,#43a047,#a5d6a7);z-index:99999999;transition:width .55s ease-out, opacity .4s ease .7s;opacity:0;box-shadow:0 0 10px rgba(67,160,71,.7);border-radius:3px 0 0 3px}
+#pk-backup-bar.show{opacity:1}
+</style>
+
+<!-- PWA: Online / Offline indicator (top-right, always visible) -->
+<div id="pk-net-indicator" class="pk-online">
+  <div id="pk-net-row">
+    <span id="pk-net-dot"></span>
+    <span id="pk-net-text">Online</span>
+  </div>
+  <div id="pk-app-version">PK258TU0451AM</div>
+</div>
+
+<!-- Piara Khata cloud backup — completion confirmation toast (✅ بیک اپ ہو گیا) -->
+<div id="pk-backup-toast" style="position:fixed;top:14px;left:50%;transform:translateX(-50%) translateY(-14px);background:rgba(30,110,60,.95);color:#fff;padding:8px 18px;border-radius:22px;font-size:13px;font-weight:800;z-index:99999998;direction:rtl;box-shadow:0 4px 16px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .35s ease, transform .35s ease">✅ آپ کا بیک اپ ہو گیا</div>
 
 <!-- DEVELOPER CHAT BUBBLE (global — visible on login page + main app) -->
 <div class="dcf-wrap" style="display: flex;">
@@ -1078,14 +1109,6 @@ select {
       <button onclick="showMyAds()" style="background:linear-gradient(135deg,#ffd700,#ff8c00);color:#1a0a00;border:none;border-radius:16px;padding:7px 14px;font-size:13px;font-weight:900;cursor:pointer;display:flex;align-items:center;gap:5px;box-shadow:0 3px 0 #a05a00">
         <span>📢</span><span>My Ads</span>
       </button>
-      <!-- PWA: Online / version indicator — sits in-flow so it never overlaps the title/phone -->
-      <div id="pk-net-indicator" class="pk-online">
-        <div id="pk-net-row">
-          <span id="pk-net-dot"></span>
-          <span id="pk-net-text">Online</span>
-        </div>
-        <div id="pk-app-version">PK248MO0432PM</div>
-      </div>
       <div style="display:flex;gap:5px">
         <button onclick="printAllReport()" style="background:rgba(255,255,255,.25);border:1.5px solid rgba(255,255,255,.5);color:#fff;padding:7px 14px;border-radius:16px;font-size:13px;font-weight:900;cursor:pointer">🖨️ Report</button>
         <button onclick="toggleSettingsMenu()" id="settings-toggle-btn" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);color:#fff;width:30px;height:30px;border-radius:50%;font-size:16px;font-weight:900;cursor:pointer">⚙️</button>
@@ -1110,7 +1133,7 @@ select {
       </div>
     </div>
     <input type="file" id="restore-file" accept=".json" style="display:none" onchange="restoreData(event)">
-  </header>
+  <div id="trial-timer-bar" style="background: linear-gradient(90deg, rgb(30, 58, 138), rgb(37, 99, 235), rgb(29, 78, 216)); color: rgb(255, 255, 255); text-align: center; padding: 2px 10px; font-size: 10px; font-weight: 800; letter-spacing: 0.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">⏳ Free trial ends in: <span style="font-size:14px;letter-spacing:1px">4d 02:28:11</span> left</div></header>
 
   <!-- BETA NOTICE -->
   <div id="beta-notice" class="no-print" style="margin:10px 12px 0 12px;background:#fffbeb;border:1.5px solid #fde68a;border-radius:12px;padding:10px 12px;direction:rtl;position:relative">
@@ -1882,10 +1905,42 @@ let entryType = 'got';
 let ncDir = 'got'; // for new customer initial balance direction
 
 function loadData(){
-  try{ records = JSON.parse(localStorage.getItem('easyKhataData')||'[]'); }
-  catch{ records = []; }
+  try{
+    var raw = localStorage.getItem('easyKhataData');
+    var parsed = raw ? JSON.parse(raw) : [];
+    if(!Array.isArray(parsed)) throw new Error('easyKhataData is not an array');
+    records = parsed;
+    // primary data is valid — refresh the safety backup
+    try{ localStorage.setItem('easyKhataData_backup', raw || '[]'); }catch(e){}
+  }catch(e){
+    // primary key corrupted/unreadable — DO NOT wipe to empty immediately.
+    // try to recover from the last known-good backup first.
+    try{
+      var backupRaw = localStorage.getItem('easyKhataData_backup');
+      var backupParsed = backupRaw ? JSON.parse(backupRaw) : [];
+      records = Array.isArray(backupParsed) ? backupParsed : [];
+      if(records.length){
+        // restore the corrupted primary key from backup so data isn't lost again
+        try{ localStorage.setItem('easyKhataData', backupRaw); }catch(e2){}
+      }
+    }catch(e2){
+      records = [];
+    }
+  }
 }
-function saveData(){ localStorage.setItem('easyKhataData', JSON.stringify(records)); }
+function saveData(){
+  try{
+    var json = JSON.stringify(records);
+    localStorage.setItem('easyKhataData', json);
+    // keep a rolling backup copy every time save succeeds
+    localStorage.setItem('easyKhataData_backup', json);
+  }catch(e){
+    // storage full/blocked — warn instead of silently losing data
+    try{ alert('ڈیٹا محفوظ کرنے میں مسئلہ ہوا۔ اسٹوریج بھری ہو سکتی ہے — براہ کرم فوراً بیک اپ لیں۔'); }catch(_){}
+  }
+  // trigger a background cloud backup (silent, non-blocking, never breaks local save)
+  try{ if(typeof pkCloudSync === 'function') pkCloudSync(); }catch(_){}
+}
 function fmt(n){ return Number(n||0).toLocaleString('en-US'); }
 // ── APP FONT TOGGLE — Arial Black / Arial Narrow / Calibri ──
 const APP_FONT_STACKS = {
@@ -2257,13 +2312,7 @@ let _trialTimerInterval = null;
 function _startTrialTimer(){
   // only for trial users (not activated)
   const activated = localStorage.getItem('ek_act');
-  if(activated === 'YES'){
-    // Defensive cleanup: an old exported copy may still have a frozen trial
-    // bar baked into the HTML — remove it, subscribed users never see it.
-    const stale = document.getElementById('trial-timer-bar');
-    if(stale) stale.remove();
-    return;
-  }
+  if(activated === 'YES') return;
   const encTs = localStorage.getItem('ek_ts');
   if(!encTs) return;
   let startTs = _decodeTime(encTs);
@@ -5746,7 +5795,7 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
   updateNetStatus();
 
   // 3) App version tag (shown under the Online/Offline indicator)
-  var PK_APP_VERSION = 'PK248MO0432PM';
+  var PK_APP_VERSION = 'PK258TU0451AM';
   document.addEventListener('DOMContentLoaded', function(){
     var v = document.getElementById('pk-app-version');
     if (v) v.textContent = PK_APP_VERSION;
@@ -5772,6 +5821,339 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
 })();
 </script>
 
+<!-- ── Piara Khata Cloud Backup (Firebase project: piara-khata-backup) ──
+     Fully isolated: its own Firebase project, own config, own storage.
+     Never touches ffpos-license or AIO POS Backup projects/accounts.
 
+     Two layers:
+       1) Firestore — silent safety copy of the data, pushed after every
+          local save(). No visual, no popup, never blocks the app.
+       2) Google Drive — the "real" backup file, written DIRECTLY from the
+          browser to Drive (same style as the AIO Direct app: first time,
+          Google asks which account to connect; after that it remembers).
+          NO server, NO Cloud Functions, NO Blaze plan needed.
+
+     The Drive file is written to ONE fixed folder only ("Piara Khata Backups"),
+     created once and reused every time — never a new folder, never scattered.
+     File name format: BKPK{day}{month}{weekday}{hh}{mm}{AM/PM}.JSON
+       e.g. BKPK248MO0720PM.JSON  → day 24, month 8, Monday, 7:20 PM
+
+     Drive backup runs automatically, with NO button:
+       • the first time the app is opened each day
+       • once after 8:00 PM each day (checked on open + every few minutes
+         while the app stays open)
+     Each time it runs: a light green progress bar shows briefly, and on
+     success a "✅ آپ کا بیک اپ ہو گیا" confirmation appears — completely
+     silent otherwise, nothing to tap. -->
+<script>
+(function(){
+  'use strict';
+
+  // ── Firebase (Firestore safety copy) ──
+  var pkFirebaseConfig = {
+    apiKey: "AIzaSyCOplSnJJf5gUAR5_SONQVNaYEiWuwQH0U",
+    authDomain: "piara-khata-backup.firebaseapp.com",
+    projectId: "piara-khata-backup",
+    storageBucket: "piara-khata-backup.firebasestorage.app",
+    messagingSenderId: "657908820627",
+    appId: "1:657908820627:web:f55f44d866b57fe6defb66"
+  };
+
+  // ── Google Drive (direct browser upload — no server) ──
+  // TODO: fill this in once the OAuth Client ID is created in Google Cloud Console
+  // (same piara-khata-backup project). This does NOT require Blaze plan.
+  var GOOGLE_DRIVE_CLIENT_ID = "657908820627-9knfb9tjj7pbtsd68g6rs0ptfemld10c.apps.googleusercontent.com";
+  var DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
+  var DRIVE_FOLDER_NAME = "Piara Khata Backups";
+
+  var pkDb = null;
+  var pkUid = null;
+  var pkReady = false;
+  var pkSyncTimer = null;
+  var pkSyncInFlight = false;
+  var pkSyncQueued = false;
+
+  var pkTokenClient = null;
+  var pkDriveAccessToken = null;
+  var pkDriveFolderId = null;
+  var pkDriveBusy = false;
+
+  // ── visual: green progress bar (right → left, then fades) ──
+  function pkShowBackupBar(){
+    try{
+      var bar = document.getElementById('pk-backup-bar');
+      if(!bar) return;
+      bar.classList.remove('show');
+      bar.style.transition = 'none';
+      bar.style.width = '0%';
+      void bar.offsetWidth; // force reflow so the transition actually animates
+      bar.style.transition = '';
+      bar.classList.add('show');
+      bar.style.width = '100%';
+      setTimeout(function(){
+        bar.classList.remove('show');
+        setTimeout(function(){ bar.style.width = '0%'; }, 500);
+      }, 1400);
+    }catch(e){}
+  }
+
+  // ── visual: "✅ آپ کا بیک اپ ہو گیا" confirmation toast ──
+  function pkShowBackupToast(){
+    try{
+      var t = document.getElementById('pk-backup-toast');
+      if(!t) return;
+      t.style.opacity = '1';
+      t.style.transform = 'translateX(-50%) translateY(0)';
+      setTimeout(function(){
+        t.style.opacity = '0';
+        t.style.transform = 'translateX(-50%) translateY(-14px)';
+      }, 2600);
+    }catch(e){}
+  }
+
+  function pkTodayStr(){
+    var d = new Date();
+    return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+  }
+
+  // Builds BKPK{day}{month}{weekday}{hh}{mm}{AMPM}.JSON — matches app version pattern
+  function pkBuildBackupFilename(date){
+    var weekdayMap = ['SU','MO','TU','WE','TH','FR','SA'];
+    var day = date.getDate();
+    var month = date.getMonth() + 1;
+    var weekday = weekdayMap[date.getDay()];
+    var h = date.getHours();
+    var ampm = h >= 12 ? 'PM' : 'AM';
+    var h12 = h % 12; if (h12 === 0) h12 = 12;
+    var hh = String(h12).padStart(2,'0');
+    var mm = String(date.getMinutes()).padStart(2,'0');
+    return 'BKPK' + day + month + weekday + hh + mm + ampm + '.JSON';
+  }
+
+  // ═══════════════ FIRESTORE (silent safety copy) ═══════════════
+  function pkInitFirebase(){
+    try{
+      if (typeof firebase === 'undefined') return; // offline on first run — app still works fully offline
+      if (!firebase.apps || !firebase.apps.length) firebase.initializeApp(pkFirebaseConfig);
+      pkDb = firebase.firestore();
+      firebase.auth().onAuthStateChanged(function(user){
+        if (user) {
+          pkUid = user.uid;
+          pkReady = true;
+          pkCheckScheduledBackups(); // now that we can sync, run the twice-daily checks
+        }
+      });
+      firebase.auth().signInAnonymously().catch(function(err){
+        console.log('Piara Khata cloud: anonymous sign-in failed (will retry later):', err && err.message);
+      });
+    }catch(e){
+      console.log('Piara Khata cloud: init skipped —', e && e.message);
+    }
+  }
+
+  // Silent debounced push — called after every local save(). No visual.
+  window.pkCloudSync = function(){
+    if (!navigator.onLine) return;
+    if (pkSyncTimer) clearTimeout(pkSyncTimer);
+    pkSyncTimer = setTimeout(function(){ pkFirestoreSync(); }, 1200);
+  };
+
+  function pkFirestoreSync(){
+    if (!pkDb || !pkReady || !pkUid) return;
+    if (pkSyncInFlight) { pkSyncQueued = true; return; }
+    pkSyncInFlight = true;
+    try{
+      var payload = {
+        records: records,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        appVersion: (typeof PK_APP_VERSION !== 'undefined' ? PK_APP_VERSION : ''),
+        recordCount: Array.isArray(records) ? records.length : 0
+      };
+      pkDb.collection('khataBackups').doc(pkUid).set(payload, { merge: true })
+        .then(function(){ try{ localStorage.setItem('ek_cloud_last_sync', String(Date.now())); }catch(e){} })
+        .catch(function(err){ console.log('Piara Khata cloud: Firestore sync failed —', err && err.message); })
+        .finally(function(){
+          pkSyncInFlight = false;
+          if (pkSyncQueued) { pkSyncQueued = false; pkFirestoreSync(); }
+        });
+    }catch(e){
+      pkSyncInFlight = false;
+      console.log('Piara Khata cloud: Firestore sync exception —', e && e.message);
+    }
+  }
+
+  // ═══════════════ GOOGLE DRIVE (direct browser upload) ═══════════════
+  function pkInitDriveTokenClient(){
+    try{
+      if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) return;
+      if (!GOOGLE_DRIVE_CLIENT_ID || GOOGLE_DRIVE_CLIENT_ID.indexOf('PASTE_YOUR') === 0) return; // not configured yet
+      pkTokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_DRIVE_CLIENT_ID,
+        scope: DRIVE_SCOPE,
+        callback: '' // set dynamically per request below
+      });
+    }catch(e){
+      console.log('Piara Khata cloud: Drive token client init failed —', e && e.message);
+    }
+  }
+
+  // Gets a fresh Drive access token. Tries silently first (no popup) if the
+  // browser already has a Google session/consent; only prompts the user the
+  // very first time (exactly like the AIO Direct app).
+  function pkGetDriveToken(onToken){
+    if (!pkTokenClient){ onToken(null); return; }
+    try{
+      pkTokenClient.callback = function(resp){
+        if (resp && resp.access_token){
+          pkDriveAccessToken = resp.access_token;
+          onToken(resp.access_token);
+        } else {
+          onToken(null);
+        }
+      };
+      var everConnected = localStorage.getItem('pk_drive_connected') === 'yes';
+      pkTokenClient.requestAccessToken({ prompt: everConnected ? '' : 'consent' });
+    }catch(e){
+      console.log('Piara Khata cloud: Drive token request failed —', e && e.message);
+      onToken(null);
+    }
+  }
+
+  function pkDriveApi(token, url, options){
+    options = options || {};
+    options.headers = options.headers || {};
+    options.headers['Authorization'] = 'Bearer ' + token;
+    return fetch(url, options);
+  }
+
+  // Finds the single fixed "Piara Khata Backups" folder, or creates it once.
+  function pkGetOrCreateFolder(token, cb){
+    var cachedId = localStorage.getItem('pk_drive_folder_id');
+    if (cachedId){ pkDriveFolderId = cachedId; cb(cachedId); return; }
+
+    var q = encodeURIComponent("name='" + DRIVE_FOLDER_NAME + "' and mimeType='application/vnd.google-apps.folder' and trashed=false");
+    pkDriveApi(token, "https://www.googleapis.com/drive/v3/files?q=" + q + "&fields=files(id,name)")
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        if (data.files && data.files.length){
+          pkDriveFolderId = data.files[0].id;
+          localStorage.setItem('pk_drive_folder_id', pkDriveFolderId);
+          cb(pkDriveFolderId);
+        } else {
+          pkDriveApi(token, "https://www.googleapis.com/drive/v3/files", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: DRIVE_FOLDER_NAME, mimeType: 'application/vnd.google-apps.folder' })
+          })
+            .then(function(r){ return r.json(); })
+            .then(function(folder){
+              pkDriveFolderId = folder.id;
+              localStorage.setItem('pk_drive_folder_id', pkDriveFolderId);
+              cb(pkDriveFolderId);
+            })
+            .catch(function(e){ console.log('Piara Khata cloud: folder create failed —', e && e.message); cb(null); });
+        }
+      })
+      .catch(function(e){ console.log('Piara Khata cloud: folder lookup failed —', e && e.message); cb(null); });
+  }
+
+  // Uploads the backup JSON file straight into the fixed Drive folder.
+  function pkUploadBackupFile(token, folderId, onDone){
+    var now = new Date();
+    var filename = pkBuildBackupFilename(now);
+    var content = JSON.stringify({
+      exportedAt: now.toISOString(),
+      appVersion: (typeof PK_APP_VERSION !== 'undefined' ? PK_APP_VERSION : ''),
+      recordCount: Array.isArray(records) ? records.length : 0,
+      records: records
+    }, null, 2);
+
+    var metadata = { name: filename, parents: [folderId], mimeType: 'application/json' };
+    var boundary = 'pkBoundary' + Date.now();
+    var body =
+      '--' + boundary + '\r\n' +
+      'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+      JSON.stringify(metadata) + '\r\n' +
+      '--' + boundary + '\r\n' +
+      'Content-Type: application/json\r\n\r\n' +
+      content + '\r\n' +
+      '--' + boundary + '--';
+
+    pkDriveApi(token, 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+      method: 'POST',
+      headers: { 'Content-Type': 'multipart/related; boundary=' + boundary },
+      body: body
+    })
+      .then(function(r){ return r.json(); })
+      .then(function(res){
+        if (res && res.id){
+          localStorage.setItem('pk_drive_connected', 'yes');
+          onDone(true);
+        } else {
+          console.log('Piara Khata cloud: Drive upload response had no id', res);
+          onDone(false);
+        }
+      })
+      .catch(function(e){
+        console.log('Piara Khata cloud: Drive upload failed —', e && e.message);
+        onDone(false);
+      });
+  }
+
+  // Full pipeline: get token → get/create folder → upload file → show confirmation.
+  function pkRunDriveBackup(){
+    if (!navigator.onLine || pkDriveBusy) return;
+    if (!pkTokenClient) { console.log('Piara Khata cloud: Drive not configured yet (missing Client ID)'); return; }
+    pkDriveBusy = true;
+    pkShowBackupBar();
+    pkGetDriveToken(function(token){
+      if (!token){ pkDriveBusy = false; return; }
+      pkGetOrCreateFolder(token, function(folderId){
+        if (!folderId){ pkDriveBusy = false; return; }
+        pkUploadBackupFile(token, folderId, function(ok){
+          pkDriveBusy = false;
+          if (ok) pkShowBackupToast();
+        });
+      });
+    });
+  }
+
+  // ═══════════════ TWICE-DAILY SILENT SCHEDULE (no button, ever) ═══════════════
+  function pkCheckScheduledBackups(){
+    if (!navigator.onLine) return;
+    try{
+      var today = pkTodayStr();
+      var hour = new Date().getHours();
+
+      var morningDone = localStorage.getItem('pk_backup_morning_date');
+      if (morningDone !== today){
+        localStorage.setItem('pk_backup_morning_date', today);
+        pkRunDriveBackup();
+      }
+
+      var eveningDone = localStorage.getItem('pk_backup_evening_date');
+      if (hour >= 20 && eveningDone !== today){
+        localStorage.setItem('pk_backup_evening_date', today);
+        pkRunDriveBackup();
+      }
+    }catch(e){}
+  }
+
+  window.addEventListener('online', function(){
+    pkCloudSync();
+    pkCheckScheduledBackups();
+  });
+
+  document.addEventListener('DOMContentLoaded', function(){
+    pkInitFirebase();
+    // give the GIS script a moment to load before wiring the token client
+    setTimeout(pkInitDriveTokenClient, 800);
+    setTimeout(pkCheckScheduledBackups, 1200);
+  });
+
+  // re-check the 8 PM condition every 10 minutes while the app stays open
+  setInterval(pkCheckScheduledBackups, 10 * 60 * 1000);
+})();
+</script>
 
 </body></html>
