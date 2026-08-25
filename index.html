@@ -5863,7 +5863,7 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
   updateNetStatus();
 
   // 3) App version tag (shown under the Online/Offline indicator)
-  var PK_APP_VERSION = 'PK258TU0805AM';
+  var PK_APP_VERSION = 'PK258TU0902AM';
   document.addEventListener('DOMContentLoaded', function(){
     var v = document.getElementById('pk-app-version');
     if (v) v.textContent = PK_APP_VERSION;
@@ -6173,6 +6173,14 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
       pkTokenClient.callback = function(resp){
         if (resp && resp.access_token){
           pkDriveAccessToken = resp.access_token;
+          // FIX: mark "connected" the moment we actually receive a token —
+          // this is the real signal that the user granted access. Before,
+          // this was only set after the ENTIRE backup (folder+upload) also
+          // succeeded, so any later hiccup meant Google asked the user to
+          // sign in and consent all over again next time, even though they
+          // had already approved it. Now, once granted, future runs go
+          // straight to a silent token refresh — no popup, no account list.
+          try{ localStorage.setItem('pk_drive_connected', 'yes'); }catch(e){}
           onToken(resp.access_token);
         } else {
           onToken(null);
@@ -6196,7 +6204,19 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
   // Finds the single fixed "Piara Khata Backups" folder, or creates it once.
   function pkGetOrCreateFolder(token, cb){
     var cachedId = localStorage.getItem('pk_drive_folder_id');
-    if (cachedId){ pkDriveFolderId = cachedId; cb(cachedId); return; }
+    // FIX: a cached value of the literal string "undefined"/"null" (or empty)
+    // is not a real folder ID — this happened once from an old bug and then
+    // every future backup kept trying to upload into a folder that doesn't
+    // exist ("File not found: undefined"). Treat these as "no cache" and
+    // look up / create the folder fresh instead of trusting garbage data.
+    var cacheIsValid = cachedId && cachedId !== 'undefined' && cachedId !== 'null';
+    if (!cachedId){ /* nothing cached, proceed to lookup */ }
+    else if (!cacheIsValid){
+      console.log('Piara Khata cloud: discarding corrupted cached folder id —', cachedId);
+      localStorage.removeItem('pk_drive_folder_id');
+    } else {
+      pkDriveFolderId = cachedId; cb(cachedId); return;
+    }
 
     var q = encodeURIComponent("name='" + DRIVE_FOLDER_NAME + "' and mimeType='application/vnd.google-apps.folder' and trashed=false");
     pkDriveApi(token, "https://www.googleapis.com/drive/v3/files?q=" + q + "&fields=files(id,name)")
@@ -6207,7 +6227,7 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
           cb(null, data.error.message || ('Drive error ' + data.error.code));
           return;
         }
-        if (data.files && data.files.length){
+        if (data.files && data.files.length && data.files[0].id){
           pkDriveFolderId = data.files[0].id;
           localStorage.setItem('pk_drive_folder_id', pkDriveFolderId);
           cb(pkDriveFolderId);
@@ -6222,6 +6242,12 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
               if (folder.error){
                 console.log('Piara Khata cloud: folder create API error —', folder.error);
                 cb(null, folder.error.message || ('Drive error ' + folder.error.code));
+                return;
+              }
+              // only cache a real, non-empty ID — never risk caching "undefined" again
+              if (!folder.id){
+                console.log('Piara Khata cloud: folder create returned no id', folder);
+                cb(null, 'فولڈر بننے کا جواب نامکمل تھا');
                 return;
               }
               pkDriveFolderId = folder.id;
@@ -6310,14 +6336,32 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
       if (!token){ finish(); pkDriveBusy = false; pkSaveDriveStatus('failed','گوگل اکاؤنٹ سے رابطہ نہیں ہو سکا (اجازت نہیں ملی)'); if(manual) alert('گوگل اکاؤنٹ سے رابطہ نہیں ہو سکا'); return; }
       pkGetOrCreateFolder(token, function(folderId, err){
         if (!folderId){ finish(); pkDriveBusy = false; pkSaveDriveStatus('failed', err || 'فولڈر نہیں بن سکا'); if(manual) alert('گوگل ڈرائیو فولڈر نہیں بن سکا: '+(err||'نامعلوم وجہ')); return; }
-        pkUploadBackupFile(token, folderId, function(ok, err2){
-          finish();
-          pkDriveBusy = false;
-          if (ok){ pkSaveDriveStatus('done'); }
-          else { pkSaveDriveStatus('failed', err2 || 'اپلوڈ ناکام'); if(manual) alert('گوگل ڈرائیو بیک اپ ناکام ہوگیا: '+(err2||'دوبارہ کوشش کریں')); }
-        });
+        pkAttemptUpload(token, folderId, false);
       });
     });
+
+    function pkAttemptUpload(token, folderId, isRetry){
+      pkUploadBackupFile(token, folderId, function(ok, err2){
+        // SELF-HEAL: if Drive says the folder itself is missing (stale cached
+        // ID pointing at a folder that no longer exists / was never real),
+        // clear the bad cache and silently retry once with a fresh folder —
+        // instead of showing the user a confusing "File not found: undefined".
+        if (!ok && !isRetry && err2 && err2.toLowerCase().indexOf('file not found') !== -1){
+          console.log('Piara Khata cloud: stale folder id detected, clearing cache and retrying once');
+          localStorage.removeItem('pk_drive_folder_id');
+          pkDriveFolderId = null;
+          pkGetOrCreateFolder(token, function(newFolderId, err3){
+            if (!newFolderId){ finish(); pkDriveBusy = false; pkSaveDriveStatus('failed', err3 || 'فولڈر نہیں بن سکا'); if(manual) alert('گوگل ڈرائیو فولڈر نہیں بن سکا: '+(err3||'نامعلوم وجہ')); return; }
+            pkAttemptUpload(token, newFolderId, true);
+          });
+          return;
+        }
+        finish();
+        pkDriveBusy = false;
+        if (ok){ pkSaveDriveStatus('done'); }
+        else { pkSaveDriveStatus('failed', err2 || 'اپلوڈ ناکام'); if(manual) alert('گوگل ڈرائیو بیک اپ ناکام ہوگیا: '+(err2||'دوبارہ کوشش کریں')); }
+      });
+    }
   }
   // Expose for the manual "Google Drive Backup" button in the settings menu
   window.pkRunDriveBackup = function(){ pkRunDriveBackup(true); };
