@@ -74,21 +74,26 @@
   color:#f87171;
 }
 #pk-app-version{
-  font-size:9px;
+  font-size:10px;
   font-weight:900;
-  letter-spacing:.4px;
-  background:linear-gradient(90deg,#fff9c4 0%,#ffd700 25%,#fff9c4 50%,#ffd700 75%,#fff9c4 100%);
-  background-size:200% auto;
-  -webkit-background-clip:text;
-  background-clip:text;
-  -webkit-text-fill-color:transparent;
-  color:transparent;
-  animation:pk-version-shine 2.5s linear infinite;
-  filter:drop-shadow(0 0 2px rgba(255,215,0,.5));
+  letter-spacing:.3px;
+  color:#3b1a00;
+  padding:5px 12px;
+  border-radius:14px;
+  white-space:nowrap;
+  background:linear-gradient(90deg,#fff9c4 0%,#ffd700 25%,#fff3a0 50%,#ffd700 75%,#fff9c4 100%);
+  background-size:220% auto;
+  box-shadow:0 0 8px rgba(255,215,0,.85), 0 0 16px rgba(255,193,7,.55), inset 0 1px 0 rgba(255,255,255,.6);
+  border:1px solid rgba(255,255,255,.6);
+  animation:pk-version-shine 2.2s linear infinite, pk-version-glow 1.8s ease-in-out infinite;
 }
 @keyframes pk-version-shine{
   0%{background-position:0% center}
-  100%{background-position:200% center}
+  100%{background-position:220% center}
+}
+@keyframes pk-version-glow{
+  0%,100%{box-shadow:0 0 6px rgba(255,215,0,.7), 0 0 12px rgba(255,193,7,.4), inset 0 1px 0 rgba(255,255,255,.6)}
+  50%{box-shadow:0 0 14px rgba(255,215,0,1), 0 0 26px rgba(255,193,7,.8), inset 0 1px 0 rgba(255,255,255,.6)}
 }
 @keyframes pk-pulse{
   0%{box-shadow:0 0 0 0 rgba(34,197,94,.55)}
@@ -1045,7 +1050,6 @@ select {
       <input type="number" id="activation-key" class="form-inp" placeholder="Enter Activation Code" dir="ltr" style="text-align:center;letter-spacing:.1em;font-size:18px;margin-bottom:6px">
       <div id="key-error" style="color:#dc2626;font-size:13px;font-weight:700;margin-bottom:10px;display:none">Wrong code! Try again</div>
       <button class="btn-unlock" onclick="tryUnlock()">Unlock →</button>
-      <button class="btn-unlock" onclick="tryUnlock()">Unlock →</button>
       
       <!-- DEVELOPER CONTACT BUTTONS - COMPACT SIZE -->
       <div style="margin-top:16px;display:flex;gap:8px;justify-content:center">
@@ -1082,15 +1086,6 @@ select {
           SMS
         </button>
       </div>
-      
-      <!-- Beta Version Notice -->
-      <div style="margin-top:16px;background:#fffbeb;border:1.5px solid #fde68a;border-radius:12px;padding:10px 12px;text-align:left;direction:rtl">
-        <div style="font-size:12px;font-weight:900;color:#92400e;margin-bottom:6px">🧪 Beta Version — یہ ایپ ابھی ٹیسٹنگ کے مرحلے میں ہے</div>
-        <div style="font-size:11px;color:#78350f;line-height:1.6;font-weight:600">
-          آپ کی بہترین رائے کے ساتھ اسے مسلسل بہتر بنایا جا رہا ہے۔ روزانہ فائلوں کا بیک اپ لیں۔<br>
-          مسئلہ یا مشورہ ہو تو اوپر ڈیویلپر بٹنز سے فوری اطلاع دیں۔
-        </div>
-      </div>
     </div>
   </div>
 </div>
@@ -1104,7 +1099,6 @@ select {
         <span id="pk-net-dot"></span>
         <span id="pk-net-text">Online</span>
       </div>
-      <div id="pk-app-version">PK258TU0612AM</div>
     </div>
     <div id="sub-info-bar" style="display:none"></div>
     <div style="display:flex;align-items:center;justify-content:center;gap:8px">
@@ -1121,6 +1115,7 @@ select {
       <button onclick="showMyAds()" style="background:linear-gradient(135deg,#ffd700,#ff8c00);color:#1a0a00;border:none;border-radius:16px;padding:7px 14px;font-size:13px;font-weight:900;cursor:pointer;display:flex;align-items:center;gap:5px;box-shadow:0 3px 0 #a05a00">
         <span>📢</span><span>My Ads</span>
       </button>
+      <div id="pk-app-version">PK258TU0625AM</div>
       <div style="display:flex;gap:5px">
         <button onclick="printAllReport()" style="background:rgba(255,255,255,.25);border:1.5px solid rgba(255,255,255,.5);color:#fff;padding:7px 14px;border-radius:16px;font-size:13px;font-weight:900;cursor:pointer">🖨️ Report</button>
         <button onclick="toggleSettingsMenu()" id="settings-toggle-btn" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);color:#fff;width:30px;height:30px;border-radius:50%;font-size:16px;font-weight:900;cursor:pointer">⚙️</button>
@@ -1145,7 +1140,7 @@ select {
       </div>
     </div>
     <input type="file" id="restore-file" accept=".json" style="display:none" onchange="restoreData(event)">
-  <div id="trial-timer-bar" style="background:rgba(255,255,255,.14); color:rgba(255,255,255,.85); text-align:center; padding:2px 10px; font-size:9px; font-weight:700; letter-spacing:0.2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; border-radius:8px; margin:2px 12px 0;">⏳ Free trial ends in: <span style="font-size:11px;letter-spacing:.5px">4d 02:28:11</span> left</div></header>
+  <div id="trial-timer-bar" style="display:none"></div></header>
 
   <!-- LAST BACKUP INFO BAR -->
   <div id="last-backup-bar" class="no-print" style="display:none;margin:6px 12px 0 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:4px 8px;align-items:center;justify-content:space-between;gap:6px;direction:rtl">
@@ -2296,33 +2291,10 @@ function _fmtDate(d){
 }
 
 function _renderSubInfoBar(){
+  // Subscribed/Trial info strip permanently disabled (per Gujjar's request) —
+  // kept as a no-op so callers don't break, bar stays hidden always.
   const bar = document.getElementById('sub-info-bar');
-  if(!bar) return;
-  const activated = localStorage.getItem('ek_act');
-
-  if(activated === 'YES'){
-    const actEncTs = localStorage.getItem('ek_act_ts');
-    if(!actEncTs){ bar.style.display='none'; return; }
-    let startTs = _decodeTime(actEncTs);
-    // if timestamp invalid (1970 or 0), use current date
-    if(!startTs || startTs < 1000000000000) startTs = Date.now();
-    const startDate = new Date(startTs);
-    const endDate = new Date(startTs + 365*86400000);
-    const remainingDays = Math.max(0, Math.ceil((endDate - Date.now())/86400000));
-    bar.style.display = 'block';
-    bar.innerHTML = `✅ Subscribed: ${_fmtDate(startDate)} &nbsp;|&nbsp; Expiry Date: ${_fmtDate(endDate)} &nbsp;|&nbsp; Remaining Days: ${remainingDays}`;
-  } else {
-    const encTs = localStorage.getItem('ek_ts');
-    if(!encTs){ bar.style.display='none'; return; }
-    let startTs = _decodeTime(encTs);
-    // if timestamp invalid, use current date
-    if(!startTs || startTs < 1000000000000) startTs = Date.now();
-    const startDate = new Date(startTs);
-    const endDate = new Date(startTs + 7*86400000);
-    const remainingDays = Math.max(0, Math.ceil((endDate - Date.now())/86400000));
-    bar.style.display = 'block';
-    bar.innerHTML = `🔶 Trial Started: ${_fmtDate(startDate)} &nbsp;|&nbsp; Trial Expires: ${_fmtDate(endDate)} &nbsp;|&nbsp; Remaining Days: ${remainingDays}`;
-  }
+  if(bar) bar.style.display = 'none';
 }
 
 let _trialTimerInterval = null;
@@ -2337,13 +2309,10 @@ function _startTrialTimer(){
   if(!startTs || startTs < 1000000000000){ startTs = Date.now(); localStorage.setItem('ek_ts', _encodeTime(startTs)); }
   const TRIAL_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days in ms
 
-  // add timer bar to header
-  if(!document.getElementById('trial-timer-bar')){
-    const bar = document.createElement('div');
-    bar.id = 'trial-timer-bar';
-    bar.style.cssText = 'background:linear-gradient(90deg,#1e3a8a,#2563eb,#1d4ed8);color:#fff;text-align:center;padding:2px 10px;font-size:10px;font-weight:800;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
-    document.querySelector('.hdr').appendChild(bar);
-  }
+  // Visual timer bar permanently disabled (per Gujjar's request) — the
+  // countdown still runs silently below so the trial still expires on time.
+  const existingBar = document.getElementById('trial-timer-bar');
+  if(existingBar) existingBar.style.display = 'none';
 
   function updateTimer(){
     const remaining = TRIAL_DURATION - (Date.now() - startTs);
@@ -2356,21 +2325,6 @@ function _startTrialTimer(){
       location.reload();
       return;
     }
-    const totalSec = Math.floor(remaining/1000);
-    const days = Math.floor(totalSec/86400);
-    const h = Math.floor((totalSec%86400)/3600);
-    const m = Math.floor((totalSec%3600)/60);
-    const s = totalSec%60;
-    const bar = document.getElementById('trial-timer-bar');
-    if(bar){
-      bar.innerHTML = `⏳ Free trial ends in: <span style="font-size:14px;letter-spacing:1px">${days}d ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}</span> left`;
-      // last day — flash red
-      if(days === 0){
-        bar.style.animation = 'pulse-badge 1s infinite';
-        bar.style.background = 'linear-gradient(135deg,#dc2626,#b91c1c)';
-      }
-    }
-    _renderSubInfoBar();
   }
   updateTimer();
   _trialTimerInterval = setInterval(updateTimer, 1000);
@@ -5883,7 +5837,7 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
   updateNetStatus();
 
   // 3) App version tag (shown under the Online/Offline indicator)
-  var PK_APP_VERSION = 'PK258TU0612AM';
+  var PK_APP_VERSION = 'PK258TU0625AM';
   document.addEventListener('DOMContentLoaded', function(){
     var v = document.getElementById('pk-app-version');
     if (v) v.textContent = PK_APP_VERSION;
