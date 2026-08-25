@@ -25,23 +25,25 @@
 <!-- PWA: Online / Offline status indicator -->
 <style>
 #pk-net-indicator{
-  position:fixed;
-  top:10px;
-  right:12px;
-  z-index:999999;
+  position:relative;
+  margin:6px auto 2px;
+  z-index:5;
   display:flex;
   flex-direction:column;
   align-items:center;
   gap:2px;
-  background:rgba(0,0,0,.45);
+  background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.08));
+  border:1px solid rgba(255,255,255,.35);
   backdrop-filter:blur(4px);
-  padding:5px 10px;
+  padding:5px 14px;
   border-radius:14px;
+  width:fit-content;
   font-size:11px;
   font-weight:700;
   color:#fff;
   font-family:sans-serif;
   pointer-events:none;
+  box-shadow:0 2px 8px rgba(0,0,0,.15);
   transition:opacity .3s ease;
 }
 #pk-net-row{
@@ -973,7 +975,7 @@ select {
 
 /* Header sub font */
 .hdr-sub { font-size: 13px !important; font-family:var(--appfont) !important; }
-.dcf-wrap{position:fixed;top:36px;left:10px;z-index:99999;display:none;align-items:center;gap:9px}
+.dcf-wrap{position:fixed;bottom:18px;left:14px;z-index:99999;display:none;align-items:center;gap:9px}
 .dcf-bubble{width:48px;height:48px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#a78bfa,#6d28d9 65%,#4c1d95);display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.4),0 0 0 3px rgba(167,139,250,.35);cursor:pointer;border:none;flex-shrink:0;transition:transform .18s;padding:0}
 .dcf-bubble:active{transform:scale(.9)}
 .dcf-menu{display:flex;align-items:center;gap:8px;max-width:0;overflow:hidden;transition:max-width .32s ease,opacity .25s ease;opacity:0}
@@ -995,15 +997,6 @@ select {
 #pk-backup-bar{position:fixed;top:0;right:0;height:4px;width:0%;background:linear-gradient(90deg,#43a047,#a5d6a7);z-index:99999999;transition:width .55s ease-out, opacity .4s ease .7s;opacity:0;box-shadow:0 0 10px rgba(67,160,71,.7);border-radius:3px 0 0 3px}
 #pk-backup-bar.show{opacity:1}
 </style>
-
-<!-- PWA: Online / Offline indicator (top-right, always visible) -->
-<div id="pk-net-indicator" class="pk-online">
-  <div id="pk-net-row">
-    <span id="pk-net-dot"></span>
-    <span id="pk-net-text">Online</span>
-  </div>
-  <div id="pk-app-version">PK258TU0451AM</div>
-</div>
 
 <!-- Piara Khata cloud backup — completion confirmation toast (✅ بیک اپ ہو گیا) -->
 <div id="pk-backup-toast" style="position:fixed;top:14px;left:50%;transform:translateX(-50%) translateY(-14px);background:rgba(30,110,60,.95);color:#fff;padding:8px 18px;border-radius:22px;font-size:13px;font-weight:800;z-index:99999998;direction:rtl;box-shadow:0 4px 16px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .35s ease, transform .35s ease">✅ آپ کا بیک اپ ہو گیا</div>
@@ -1094,6 +1087,14 @@ select {
 <div id="app" style="display: flex;">
   <!-- HEADER -->
   <header class="hdr no-print" style="position:relative">
+    <!-- Online / Offline + version indicator (in-flow, centered, never overlaps anything) -->
+    <div id="pk-net-indicator" class="pk-online">
+      <div id="pk-net-row">
+        <span id="pk-net-dot"></span>
+        <span id="pk-net-text">Online</span>
+      </div>
+      <div id="pk-app-version">PK258TU0548AM</div>
+    </div>
     <div id="sub-info-bar" style="display: block; margin: -6px -12px 6px; background: linear-gradient(90deg, rgb(30, 58, 138), rgb(37, 99, 235), rgb(29, 78, 216)); border-radius: 0px; padding: 3px 12px; font-size: 9px; font-weight: 800; color: rgb(255, 255, 255); line-height: 1.4; text-align: center; direction: ltr; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 4px;">🔶 Trial Started: 25-07-2026 &nbsp;|&nbsp; Trial Expires: 01-08-2026 &nbsp;|&nbsp; Remaining Days: 5</div>
     <div style="display:flex;align-items:center;justify-content:center;gap:8px">
       <div class="hdr-title">PIARA KHATA</div>
@@ -1134,15 +1135,6 @@ select {
     </div>
     <input type="file" id="restore-file" accept=".json" style="display:none" onchange="restoreData(event)">
   <div id="trial-timer-bar" style="background: linear-gradient(90deg, rgb(30, 58, 138), rgb(37, 99, 235), rgb(29, 78, 216)); color: rgb(255, 255, 255); text-align: center; padding: 2px 10px; font-size: 10px; font-weight: 800; letter-spacing: 0.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">⏳ Free trial ends in: <span style="font-size:14px;letter-spacing:1px">4d 02:28:11</span> left</div></header>
-
-  <!-- BETA NOTICE -->
-  <div id="beta-notice" class="no-print" style="margin:10px 12px 0 12px;background:#fffbeb;border:1.5px solid #fde68a;border-radius:12px;padding:10px 12px;direction:rtl;position:relative">
-    <button onclick="document.getElementById('beta-notice').style.display='none'" style="position:absolute;top:6px;left:8px;background:none;border:none;font-size:14px;color:#92400e;cursor:pointer;font-weight:900">✖</button>
-    <div style="font-size:12px;font-weight:900;color:#92400e;margin-bottom:4px;padding-left:18px">🧪 بیٹا ورژن — یہ ایپ ٹیسٹنگ کے مرحلے میں ہے</div>
-    <div style="font-size:11px;color:#78350f;line-height:1.8;font-weight:600">
-      آپ کی بہترین رائے سے مسلسل بہتر بنایا جا رہا ہے۔ روزانہ اپنی فائلوں کا 💾 بیک اپ لینا نہ بھولیں، اور کوئی مسئلہ یا مشورہ ہو تو نیچے 💬 بٹن سے ڈیویلپر کو ضرور بتائیں۔
-    </div>
-  </div>
 
   <!-- LAST BACKUP INFO BAR -->
   <div id="last-backup-bar" class="no-print" style="display:none;margin:8px 12px 0 12px;background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:7px 10px;align-items:center;justify-content:space-between;gap:8px;direction:rtl">
@@ -1197,6 +1189,18 @@ select {
       <button class="mini-fab mini-fab-add" onclick="showAddCustomer()" title="New Customer" aria-label="New Customer">
         <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
       </button>
+      <button class="mini-fab" id="select-mode-btn" onclick="toggleSelectMode()" title="Select customers to delete" aria-label="Select" style="background:linear-gradient(135deg,#64748b,#475569)">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"></rect><path d="M8 12l2.5 2.5L16 9"></path></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- SELECT MODE BAR -->
+  <div id="select-mode-bar" class="no-print" style="display:none;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;background:#1e293b;color:#fff;position:sticky;top:0;z-index:150">
+    <span id="select-count-txt" style="font-weight:900;font-size:13px">0 selected</span>
+    <div style="display:flex;gap:8px">
+      <button onclick="cancelSelectMode()" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:8px;padding:7px 12px;font-weight:800;font-size:12px">Cancel</button>
+      <button onclick="bulkDeleteSelected()" style="background:#dc2626;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-weight:900;font-size:12px">🗑️ Delete Selected</button>
     </div>
   </div>
 
@@ -1900,6 +1904,8 @@ let currentFilter = 'all'; // 'all' | 'credit' | 'debt' | 'zero'
 let currentSort = 'new';   // 'max' | 'min' | 'az' | 'za' | 'new' | 'old'
 let currentCustomer = null;
 let confirmCallback = null;
+let selectMode=false;
+let selectedCustomers=new Set();
 let posterRecord = null;
 let entryType = 'got';
 let ncDir = 'got'; // for new customer initial balance direction
@@ -2759,10 +2765,17 @@ function renderList(){
     const sn=c.name.replace(/'/g,"\\'");
     const phone=c.phone.replace(/[^0-9+]/g,'');
     const whatsappMsg=encodeURIComponent(`As-salamu alaykum ${c.name},\n\nYour current balance: Rs ${fmt(Math.abs(c.net))}\n\nPlease contact me if you have any questions.`);
+    const isChecked=selectedCustomers.has(c.name);
+    const checkboxHtml=selectMode?`<div class="cust-select-box" onclick="event.stopPropagation();toggleCustomerSelect('${sn}')" style="display:flex;align-items:center;padding:0 6px 0 2px">
+      <div style="width:24px;height:24px;border-radius:7px;border:2.5px solid ${isChecked?'#2563eb':'#cbd5e1'};background:${isChecked?'#2563eb':'#fff'};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        ${isChecked?'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"></path></svg>':''}
+      </div>
+    </div>`:'';
     return `<div class="${cardCls}">
       <div class="cust-stripe"></div>
       <div class="cust-card-body">
-        <div class="cust-info" onclick="openDetail('${sn}')">
+        ${checkboxHtml}
+        <div class="cust-info" onclick="${selectMode?`toggleCustomerSelect('${sn}')`:`openDetail('${sn}')`}">
           <div class="cust-name">${c.name}</div>
           ${c.phone
             ? `<div class="cust-phone-row">
@@ -3145,6 +3158,70 @@ function deleteCustomer(){
   document.getElementById('modal-confirm').style.display='flex';
 }
 function confirmDelete(){ if(confirmCallback) confirmCallback(); closeModal('modal-confirm'); }
+
+// ============================================================
+// SELECT MODE — multi-select customers to delete
+// ============================================================
+function toggleSelectMode(){
+  selectMode=!selectMode;
+  selectedCustomers.clear();
+  document.getElementById('select-mode-bar').style.display = selectMode ? 'flex' : 'none';
+  updateSelectCountTxt();
+  renderList();
+}
+function cancelSelectMode(){
+  selectMode=false;
+  selectedCustomers.clear();
+  document.getElementById('select-mode-bar').style.display='none';
+  renderList();
+}
+function toggleCustomerSelect(name){
+  if(selectedCustomers.has(name)) selectedCustomers.delete(name);
+  else selectedCustomers.add(name);
+  updateSelectCountTxt();
+  renderList();
+}
+function updateSelectCountTxt(){
+  const el=document.getElementById('select-count-txt');
+  if(el) el.textContent = selectedCustomers.size + ' selected';
+}
+function bulkDeleteSelected(){
+  if(selectedCustomers.size===0){ alert('Please select at least one customer first.'); return; }
+  const names=[...selectedCustomers];
+  const withBalance = names.filter(n => getCustomerNet(n) !== 0);
+
+  if(withBalance.length === 0){
+    confirmCallback=()=>{
+      records = records.filter(r => !names.includes(r.name.trim()));
+      saveData();
+      cancelSelectMode();
+    };
+    document.getElementById('confirm-title').textContent = 'Delete ' + names.length + ' Customer(s)';
+    document.getElementById('confirm-msg').textContent = 'These customers have zero balance. Delete them and all their records?';
+    document.getElementById('modal-confirm').style.display='flex';
+    return;
+  }
+
+  const list = withBalance.map(n => {
+    const net = getCustomerNet(n);
+    const lbl = net < 0 ? 'you still owe them' : 'they still owe you';
+    return `• ${n}: Rs ${fmt(Math.abs(net))} (${lbl})`;
+  }).join('\n');
+
+  const firstMsg = '⚠️ WARNING\n\n' + withBalance.length + ' of the selected customer(s) still have a pending balance:\n\n' + list + '\n\nDeleting them will permanently erase this payment record. This cannot be undone.';
+
+  if(!confirm(firstMsg + '\n\nDo you want to continue?')) return;
+
+  const secondMsg = '⚠️ FINAL CONFIRMATION\n\nAre you absolutely sure? You are about to lose Rs '
+    + fmt(withBalance.reduce((s,n)=>s+Math.abs(getCustomerNet(n)),0))
+    + ' worth of unsettled payment history for '+withBalance.length+' customer(s).';
+
+  if(!confirm(secondMsg)) return;
+
+  records = records.filter(r => !names.includes(r.name.trim()));
+  saveData();
+  cancelSelectMode();
+}
 
 // ============================================================
 // EDIT RECORD
@@ -5795,7 +5872,7 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
   updateNetStatus();
 
   // 3) App version tag (shown under the Online/Offline indicator)
-  var PK_APP_VERSION = 'PK258TU0451AM';
+  var PK_APP_VERSION = 'PK258TU0548AM';
   document.addEventListener('DOMContentLoaded', function(){
     var v = document.getElementById('pk-app-version');
     if (v) v.textContent = PK_APP_VERSION;
