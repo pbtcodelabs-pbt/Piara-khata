@@ -1,4 +1,4 @@
-<html lang="en" dir="ltr" style="--appfont: 'Arial Narrow',Arial,sans-serif;"><head>
+<html lang="en" dir="ltr"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="mobile-web-app-capable" content="yes">
@@ -130,7 +130,7 @@ input,textarea,select{font-family:inherit;outline:none}
 
 /* ===== HEADER ===== */
 .hdr{background:linear-gradient(135deg,#b91c1c 0%,#dc2626 40%,#ea580c 100%);color:#fff;padding:6px 12px;text-align:center;position:sticky;top:0;z-index:50;box-shadow:0 3px 16px rgba(185,28,28,.4)}
-.hdr-title{font-size:27px;font-weight:900;letter-spacing:2px;font-family:Arial,sans-serif}
+.hdr-title{font-size:27px;font-weight:900;letter-spacing:2px;font-family:var(--appfont)}
 .hdr-sub{font-size:13px;font-weight:700;opacity:.9;margin-top:1px}
 .hdr-phone{font-size:12px;font-weight:700;margin-top:1px;direction:ltr;display:inline-block}
 .hdr-btns{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:8px}
@@ -143,14 +143,14 @@ input,textarea,select{font-family:inherit;outline:none}
 /* Credit = Received = GREEN */
 .stat-box.credit{background:linear-gradient(145deg,#f0fdf4,#dcfce7);border-color:#16a34a}
 .stat-box.credit .stat-lbl{color:#15803d;font-size:9px;font-weight:900;display:block;margin-bottom:2px}
-.stat-box.credit .stat-val{color:#14532d;font-size:13px;font-weight:900;direction:ltr;display:block;font-family:Arial,sans-serif}
+.stat-box.credit .stat-val{color:#14532d;font-size:13px;font-weight:900;direction:ltr;display:block;font-family:var(--appfont)}
 /* Debt = Paid = RED */
 .stat-box.debt{background:linear-gradient(145deg,#fef2f2,#fee2e2);border-color:#dc2626}
 .stat-box.debt .stat-lbl{color:#b91c1c;font-size:9px;font-weight:900;display:block;margin-bottom:2px}
-.stat-box.debt .stat-val{color:#7f1d1d;font-size:13px;font-weight:900;direction:ltr;display:block;font-family:Arial,sans-serif}
+.stat-box.debt .stat-val{color:#7f1d1d;font-size:13px;font-weight:900;direction:ltr;display:block;font-family:var(--appfont)}
 .stat-box.balance{background:linear-gradient(145deg,#1d4ed8,#1e40af);color:#fff;flex:1.2;box-shadow:0 4px 0 #1e3a8a,0 6px 16px rgba(29,78,216,0.4)}
 .stat-box.balance .stat-lbl{color:rgba(255,255,255,.9);font-size:9px;font-weight:900;display:block;margin-bottom:2px}
-.stat-box.balance .stat-val{color:#fff;font-size:13px;font-weight:900;direction:ltr;display:block;font-family:Arial,sans-serif}
+.stat-box.balance .stat-val{color:#fff;font-size:13px;font-weight:900;direction:ltr;display:block;font-family:var(--appfont)}
 
 /* ===== SEARCH ===== */
 .search-wrap{padding:2px 8px 1px}
@@ -182,7 +182,7 @@ input,textarea,select{font-family:inherit;outline:none}
 }
 .cust-card-credit:active{transform:translateY(4px);box-shadow:0 1px 0 #166534}
 .cust-card-credit .cust-stripe{background:linear-gradient(90deg,#16a34a,#15803d);height:3px}
-.cust-card-credit .cust-bal-num{color:#14532d;font-size:18px;font-weight:900;font-family:Arial,sans-serif;direction:ltr;line-height:1}
+.cust-card-credit .cust-bal-num{color:#14532d;font-size:18px;font-weight:900;font-family:var(--appfont);direction:ltr;line-height:1}
 .cust-card-credit .cust-bal-lbl{color:#15803d;font-size:10px;font-weight:900;font-family:var(--appfont);text-align:center}
 
 /* ── Debt card (RED) ── */
@@ -200,7 +200,7 @@ input,textarea,select{font-family:inherit;outline:none}
 }
 .cust-card-debt:active{transform:translateY(4px);box-shadow:0 1px 0 #7f1d1d}
 .cust-card-debt .cust-stripe{background:linear-gradient(90deg,#dc2626,#b91c1c);height:3px}
-.cust-card-debt .cust-bal-num{color:#7f1d1d;font-size:18px;font-weight:900;font-family:Arial,sans-serif;direction:ltr;line-height:1}
+.cust-card-debt .cust-bal-num{color:#7f1d1d;font-size:18px;font-weight:900;font-family:var(--appfont);direction:ltr;line-height:1}
 .cust-card-debt .cust-bal-lbl{color:#b91c1c;font-size:10px;font-weight:900;font-family:var(--appfont);text-align:center}
 
 /* ── Zero card (GREY) ── */
@@ -218,7 +218,7 @@ input,textarea,select{font-family:inherit;outline:none}
 }
 .cust-card-zero:active{transform:translateY(3px);box-shadow:0 1px 0 #475569}
 .cust-card-zero .cust-stripe{background:linear-gradient(90deg,#475569,#334155);height:3px}
-.cust-card-zero .cust-bal-num{color:#334155;font-size:18px;font-weight:900;font-family:Arial,sans-serif;direction:ltr;line-height:1}
+.cust-card-zero .cust-bal-num{color:#334155;font-size:18px;font-weight:900;font-family:var(--appfont);direction:ltr;line-height:1}
 .cust-card-zero .cust-bal-lbl{color:#64748b;font-size:10px;font-weight:900;font-family:var(--appfont);text-align:center}
 
 /* ── Card body ── */
@@ -227,9 +227,9 @@ input,textarea,select{font-family:inherit;outline:none}
 /* ── Card info ── */
 .cust-info{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;justify-content:flex-start}
 .cust-name{font-size:15px;font-weight:900;color:#0f172a;margin-bottom:2px;white-space:normal;word-break:break-word;overflow-wrap:break-word;hyphens:auto;font-family:var(--appfont);direction:ltr;text-align:left;line-height:1.3}
-.cust-phone-pill{font-size:12px;font-weight:900;color:#1d4ed8;direction:ltr;background:transparent;padding:0;border-radius:10px;display:block;font-family:Arial,sans-serif;letter-spacing:0.3px;word-break:break-all;margin-top:1px}
-.cust-phone-link{font-size:12px;font-weight:900;color:#1d4ed8;direction:ltr;background:transparent;padding:0;border-radius:10px;display:block;font-family:Arial,sans-serif;letter-spacing:0.3px;word-break:break-all;margin-top:2px;text-decoration:none;cursor:pointer}
-.cust-date-small{font-size:10px;color:#94a3b8;font-weight:700;font-family:Arial,sans-serif}
+.cust-phone-pill{font-size:12px;font-weight:900;color:#1d4ed8;direction:ltr;background:transparent;padding:0;border-radius:10px;display:block;font-family:var(--appfont);letter-spacing:0.3px;word-break:break-all;margin-top:1px}
+.cust-phone-link{font-size:12px;font-weight:900;color:#1d4ed8;direction:ltr;background:transparent;padding:0;border-radius:10px;display:block;font-family:var(--appfont);letter-spacing:0.3px;word-break:break-all;margin-top:2px;text-decoration:none;cursor:pointer}
+.cust-date-small{font-size:10px;color:#94a3b8;font-weight:700;font-family:var(--appfont)}
 
 /* ── Balance box ── */
 .cust-bal-box{text-align:center;flex-shrink:0;min-width:72px;order:-1}
@@ -241,7 +241,7 @@ input,textarea,select{font-family:inherit;outline:none}
 .detail-hdr{background:linear-gradient(135deg,#dc2626,#ea580c);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:10}
 .detail-back{background:rgba(255,255,255,.2);color:#fff;width:36px;height:36px;border-radius:50%;font-size:20px}
 .detail-net{text-align:center;padding:16px;background:#fff;border-bottom:1px solid #e2e8f0}
-.detail-net-val{font-size:36px;font-weight:900;direction:ltr;font-family:Arial,sans-serif}
+.detail-net-val{font-size:36px;font-weight:900;direction:ltr;font-family:var(--appfont)}
 .detail-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px;background:#fff;border-bottom:1px solid #e2e8f0}
 .detail-action-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px;border-radius:12px;border:1.5px solid #e2e8f0!important;background:linear-gradient(145deg,#f8fafc,#f1f5f9);font-size:18px;font-weight:900;color:#475569;box-shadow:0 2px 6px rgba(0,0,0,0.08)}
 
@@ -263,7 +263,7 @@ input,textarea,select{font-family:inherit;outline:none}
 .tbl-type-badge{font-size:9px;font-weight:900;padding:2px 6px;border-radius:6px;display:inline-block;margin-top:1px}
 .badge-got{background:#16a34a;color:#fff}
 .badge-gave{background:#dc2626;color:#fff}
-.num-cell{text-align:center;direction:ltr;font-family:Arial,sans-serif;font-weight:900;font-size:12px}
+.num-cell{text-align:center;direction:ltr;font-family:var(--appfont);font-weight:900;font-size:12px}
 .action-icon-btn{background:none;padding:3px 4px;border-radius:6px;font-size:14px;opacity:.8}
 .edit-btn{background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;border:none;padding:3px 7px;border-radius:7px;font-size:10px;font-weight:900;cursor:pointer;display:block;margin:2px auto 0;box-shadow:0 2px 4px rgba(29,78,216,.3)}
 
@@ -292,7 +292,7 @@ input,textarea,select{font-family:inherit;outline:none}
 .btn-success:active{background:#15803d}
 .info-row{display:flex;justify-content:space-between;align-items:center;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px 14px;margin-bottom:14px}
 .info-row-lbl{color:#64748b;font-size:13px;font-weight:700}
-.info-row-val{font-size:16px;font-weight:900;color:#0f172a;font-family:Arial,sans-serif;direction:ltr}
+.info-row-val{font-size:16px;font-weight:900;color:#0f172a;font-family:var(--appfont);direction:ltr}
 
 /* ===== LOCK SCREEN ===== */
 .lock-screen{position:fixed;inset:0;background:#0f172a;z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px}
@@ -310,7 +310,7 @@ input,textarea,select{font-family:inherit;outline:none}
 .btn-unlock{width:100%;background:#2563eb;color:#fff;padding:14px;border-radius:14px;font-weight:900;font-size:16px;margin-bottom:14px}
 .ep-box{background:#f0fdf4;border:1.5px solid rgba(34,197,94,.4);border-radius:14px;padding:16px;margin-top:8px;border-top:4px solid #22c55e}
 .ep-account{background:#fff;border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:12px;text-align:center;margin-top:12px}
-.ep-name{font-size:18px;font-weight:900;color:#0f172a;font-family:Arial,sans-serif}
+.ep-name{font-size:18px;font-weight:900;color:#0f172a;font-family:var(--appfont)}
 .ep-num{font-size:22px;font-weight:900;color:#22c55e;font-family:monospace;direction:ltr}
 
 /* ===== POSTER ===== */
@@ -332,7 +332,7 @@ input,textarea,select{font-family:inherit;outline:none}
   color: #1a0a00;
   border: none;
   border-radius: 30px;
-  font-family: Arial, sans-serif;
+  font-family: var(--appfont);
   font-size: 15px;
   font-weight: 900;
   letter-spacing: 1px;
@@ -423,7 +423,7 @@ input,textarea,select{font-family:inherit;outline:none}
   width: 100%;
   background: linear-gradient(160deg, #0d5c2e 0%, #0a4a24 40%, #073d1e 100%);
   padding: 18px 16px 0;
-  font-family: Arial, sans-serif;
+  font-family: var(--appfont);
   position: relative;
   border: 3px solid #1a6b38;
 }
@@ -736,7 +736,7 @@ input,textarea,select{font-family:inherit;outline:none}
   display:flex;
   align-items:center;
   justify-content:center;
-  font-family:Arial,sans-serif;
+  font-family:var(--appfont);
   font-weight:900;
   color:#fff;
   background:linear-gradient(145deg,#34f27d,#0a8f4b);
@@ -750,7 +750,7 @@ input,textarea,select{font-family:inherit;outline:none}
   display:flex;
   align-items:center;
   justify-content:center;
-  font-family:Arial,sans-serif;
+  font-family:var(--appfont);
   font-weight:900;
   color:#fff;
   background:linear-gradient(145deg,#2ccbb0,#075e54);
@@ -774,7 +774,7 @@ input,textarea,select{font-family:inherit;outline:none}
 /* ===== CUSTOMER COUNT BAR ===== */
 .count-bar{display:flex;align-items:center;justify-content:space-between;padding:3px 8px 2px;direction:ltr}
 .count-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#1e3a5f,#162d4a);color:#fff;border-radius:20px;padding:5px 14px;font-size:13px;font-weight:900}
-.count-badge .count-num{font-size:18px;font-weight:900;font-family:Arial,sans-serif;color:#fbbf24}
+.count-badge .count-num{font-size:18px;font-weight:900;font-family:var(--appfont);color:#fbbf24}
 .count-sub{font-size:11px;color:#64748b;font-weight:700}
 
 /* ── Compact action buttons (add / calculator) — replace old floating FABs ── */
@@ -849,23 +849,23 @@ input,textarea,select{font-family:inherit;outline:none}
 
 /* Count badge smaller */
 .count-badge{background:linear-gradient(135deg,#1e3a5f,#0f2340);border-radius:12px;padding:4px 10px;display:flex;align-items:center;gap:6px}
-.count-badge .count-num{font-size:16px;font-weight:900;font-family:Arial,sans-serif;color:#fbbf24}
+.count-badge .count-num{font-size:16px;font-weight:900;font-family:var(--appfont);color:#fbbf24}
 
 /* Detail action btn */
 .detail-action-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px;border-radius:12px;border:1.5px solid #e2e8f0!important;background:linear-gradient(145deg,#f8fafc,#f1f5f9);font-size:18px;font-weight:900;color:#475569;transition:all .15s;box-shadow:0 2px 6px rgba(0,0,0,0.08)}
 .detail-action-btn:active{transform:scale(.96);box-shadow:0 1px 3px rgba(0,0,0,0.1)}
 
 /* Phone pill improved */
-.cust-phone-pill{font-size:11px;font-weight:900;color:#1d4ed8;direction:ltr;background:transparent;padding:0;border-radius:8px;display:inline;font-family:Arial,sans-serif;letter-spacing:0.3px;word-break:break-all}
+.cust-phone-pill{font-size:11px;font-weight:900;color:#1d4ed8;direction:ltr;background:transparent;padding:0;border-radius:8px;display:inline;font-family:var(--appfont);letter-spacing:0.3px;word-break:break-all}
 
 /* Date small compact */
-.cust-date-small{font-size:9px;color:#94a3b8;font-weight:700;font-family:Arial,sans-serif}
+.cust-date-small{font-size:9px;color:#94a3b8;font-weight:700;font-family:var(--appfont)}
 
 /* Bottom buttons area */
 .bottom-btns{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:linear-gradient(180deg,rgba(255,255,255,0.96),#fff);border-top:1px solid #e2e8f0;padding:8px 12px 14px;display:flex;gap:8px;z-index:100;box-shadow:0 -4px 20px rgba(0,0,0,.1)}
 
 /* Header title improved */
-.hdr-title{font-size:27px;font-weight:900;letter-spacing:2px;font-family:Arial,sans-serif;text-shadow:0 1px 3px rgba(0,0,0,0.2)}
+.hdr-title{font-size:27px;font-weight:900;letter-spacing:2px;font-family:var(--appfont);text-shadow:0 1px 3px rgba(0,0,0,0.2)}
 .hdr-sub{font-size:12px;font-weight:700;opacity:.9;margin-top:1px;font-family:var(--appfont)}
 .hdr-btns{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-top:6px}
 
@@ -894,7 +894,7 @@ select {
 .stat-box.credit .stat-lbl,
 .stat-box.debt .stat-lbl,
 .stat-box.balance .stat-lbl {
-  font-family: Arial, sans-serif !important;
+  font-family: var(--appfont) !important;
   font-size: 10px !important;
   letter-spacing: 0.3px;
 }
@@ -913,7 +913,7 @@ select {
 /* Balance number in card */
 .cust-bal-num {
   font-size: 15px !important;
-  font-family: Arial, sans-serif !important;
+  font-family: var(--appfont) !important;
   direction: ltr !important;
 }
 .cust-bal-lbl {
@@ -1115,7 +1115,7 @@ select {
       <button onclick="showMyAds()" style="background:linear-gradient(135deg,#ffd700,#ff8c00);color:#1a0a00;border:none;border-radius:16px;padding:7px 14px;font-size:13px;font-weight:900;cursor:pointer;display:flex;align-items:center;gap:5px;box-shadow:0 3px 0 #a05a00">
         <span>📢</span><span>My Ads</span>
       </button>
-      <div id="pk-app-version">PK258TU0445PM</div>
+      <div id="pk-app-version">PK258MO01</div>
       <div style="display:flex;gap:8px;align-items:center;padding-inline-end:6px">
         <button onclick="printAllReport()" style="background:rgba(255,255,255,.25);border:1.5px solid rgba(255,255,255,.5);color:#fff;padding:7px 14px;border-radius:16px;font-size:13px;font-weight:900;cursor:pointer">🖨️ Report</button>
         <!-- FIX: settings/gear button was hugging the very edge of the screen
@@ -1139,22 +1139,13 @@ select {
         <div style="font-size:10px;font-weight:900;color:#94a3b8;margin-bottom:6px;text-align:center;letter-spacing:.4px">🔤 APP FONT STYLE</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
           <button id="font-opt-arialblack" onclick="setAppFont('arialblack');toggleSettingsMenu()" style="background:#f1f5f9;color:#0f172a;border:1.5px solid #cbd5e1;border-radius:8px;padding:8px 4px;font-size:11px;font-weight:900;cursor:pointer;font-family:'Arial Black',Arial,sans-serif">Arial Black</button>
-          <button id="font-opt-arialnarrow" onclick="setAppFont('arialnarrow');toggleSettingsMenu()" style="background: rgb(241, 245, 249); color: rgb(15, 23, 42); border: 2.5px solid rgb(37, 99, 235); border-radius: 8px; padding: 8px 4px; font-size: 11px; font-weight: 900; cursor: pointer; font-family: &quot;Arial Narrow&quot;, Arial, sans-serif;">Arial Narrow</button>
+          <button id="font-opt-arialnarrow" onclick="setAppFont('arialnarrow');toggleSettingsMenu()" style="background:#f1f5f9;color:#0f172a;border:1.5px solid #cbd5e1;border-radius:8px;padding:8px 4px;font-size:11px;font-weight:900;cursor:pointer;font-family:'Arial Narrow',Arial,sans-serif">Arial Narrow</button>
           <button id="font-opt-calibri" onclick="setAppFont('calibri');toggleSettingsMenu()" style="background:#f1f5f9;color:#0f172a;border:1.5px solid #cbd5e1;border-radius:8px;padding:8px 4px;font-size:11px;font-weight:900;cursor:pointer;font-family:Calibri,Arial,sans-serif">Calibri</button>
         </div>
       </div>
     </div>
     <input type="file" id="restore-file" accept=".json" style="display:none" onchange="restoreData(event)">
   <div id="trial-timer-bar" style="display:none"></div></header>
-
-  <!-- LAST BACKUP INFO BAR -->
-  <div id="last-backup-bar" class="no-print" style="display:none;margin:6px 12px 0 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:4px 8px;align-items:center;justify-content:space-between;gap:6px;direction:rtl">
-    <div style="display:flex;flex-direction:column;overflow:hidden;flex:1">
-      <span style="font-size:9px;font-weight:900;color:#1d4ed8">💾 آخری بیک اپ</span>
-      <span id="last-backup-name" style="font-size:10px;direction:ltr;color:#334155;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></span>
-    </div>
-    <button onclick="pkCopyLastBackupName()" style="flex-shrink:0;background:#2563eb;color:#fff;border:none;border-radius:6px;padding:4px 8px;font-size:9px;font-weight:900;cursor:pointer">📋 کاپی</button>
-  </div>
 
   <!-- TAPPABLE Google Drive backup shortcut — tapping opens the actual
        "Piara Khata Backups" folder in Google Drive. Uses the real Google
@@ -1351,7 +1342,7 @@ select {
       <div style="display:flex;align-items:center;gap:10px">
         <button class="detail-back" onclick="closeDetail()">‹</button>
         <div>
-          <div style="font-size:18px;font-weight:900;font-family:Arial,sans-serif" id="dv-name"></div>
+          <div style="font-size:18px;font-weight:900;font-family:var(--appfont)" id="dv-name"></div>
           <div style="font-size:13px;opacity:.85;direction:ltr" id="dv-phone"></div>
         </div>
       </div>
@@ -1388,12 +1379,12 @@ select {
   </div>
   <div class="bottom-btns no-print">
     <button class="btn-got" onclick="showEntryModal('got')">
-      <span style="font-size:18px;letter-spacing:.5px;font-family:Arial,sans-serif">✓ Received</span>
+      <span style="font-size:18px;letter-spacing:.5px;font-family:var(--appfont)">✓ Received</span>
       <span style="font-size:11px;opacity:.85">Amount Received</span>
     </button>
     <button class="btn-back-round" onclick="closeDetail()">BACK</button>
     <button class="btn-gave" onclick="showEntryModal('gave')">
-      <span style="font-size:18px;letter-spacing:.5px;font-family:Arial,sans-serif">✓ Paid</span>
+      <span style="font-size:18px;letter-spacing:.5px;font-family:var(--appfont)">✓ Paid</span>
       <span style="font-size:11px;opacity:.85">Amount Paid</span>
     </button>
   </div>
@@ -1492,7 +1483,7 @@ select {
 }
 .nc-input[dir="ltr"] {
   text-align: left;
-  font-family: Arial, sans-serif;
+  font-family: var(--appfont);
   font-size: 14px;
   letter-spacing: 0.3px;
 }
@@ -1586,7 +1577,7 @@ select {
   padding: 8px 12px;
   border: 1.5px solid rgba(147,197,253,0.35);
   border-radius: 9px;
-  font-family: Arial, sans-serif;
+  font-family: var(--appfont);
   font-size: 20px;
   font-weight: 900;
   background: rgba(255,255,255,0.1);
@@ -1628,7 +1619,7 @@ select {
 .nc-type-btn {
   padding: 8px 6px;
   border-radius: 10px;
-  font-family: Arial, sans-serif;
+  font-family: var(--appfont);
   font-size: 12px;
   font-weight: 900;
   text-align: center;
@@ -1678,7 +1669,7 @@ select {
   border-radius: 10px;
   background: linear-gradient(145deg, #3b82f6, #2563eb);
   color: #ffffff;
-  font-family: Arial, sans-serif;
+  font-family: var(--appfont);
   font-size: 15px;
   font-weight: 900;
   text-align: center;
@@ -1741,7 +1732,7 @@ select {
         <!-- Phone — green 3D box -->
         <div class="nc-box-phone" style="position:relative;overflow:visible">
           <label class="nc-label" style="text-align:left;direction:ltr">📞 Phone</label>
-          <input type="tel" id="nc-phone" class="nc-input" placeholder="03001234567" dir="ltr" autocomplete="off" onfocus="ncEnsureContacts()" oninput="ncPhoneLookup(this.value)" onblur="setTimeout(function(){var d=document.getElementById('nc-phone-drop');if(d)d.style.display='none'},280)" style="font-family:Arial,sans-serif">
+          <input type="tel" id="nc-phone" class="nc-input" placeholder="03001234567" dir="ltr" autocomplete="off" onfocus="ncEnsureContacts()" oninput="ncPhoneLookup(this.value)" onblur="setTimeout(function(){var d=document.getElementById('nc-phone-drop');if(d)d.style.display='none'},280)" style="font-family:var(--appfont)">
           <div id="nc-phone-drop" style="display:none;position:absolute;top:100%;right:0;left:0;background:#fff;border:2.5px solid #16a34a;border-top:none;border-radius:0 0 12px 12px;z-index:99999;max-height:200px;overflow-y:auto;box-shadow:0 10px 24px rgba(0,0,0,.28)"></div>
         </div>
       </div>
@@ -1749,7 +1740,7 @@ select {
       <!-- Amount — dark navy 3D box -->
       <div class="nc-amount-box">
         <span class="nc-amount-label">Opening Balance — Opening Balance (Rs)</span>
-        <input type="number" id="nc-amount" class="nc-amount-inp" placeholder="0" dir="ltr" style="font-family:Arial,sans-serif">
+        <input type="number" id="nc-amount" class="nc-amount-inp" placeholder="0" dir="ltr" style="font-family:var(--appfont)">
       </div>
 
       <!-- Type buttons -->
@@ -2001,6 +1992,12 @@ function _markActiveFontOption(key){
 (function initAppFont(){
   const key = localStorage.getItem('app_font') || 'arialblack';
   document.documentElement.style.setProperty('--appfont', APP_FONT_STACKS[key] || APP_FONT_STACKS.arialblack);
+  // FIX: the selected-font highlight (blue border) on the Settings menu
+  // buttons was previously only updated at the moment you tapped a font —
+  // on every fresh page load it stayed wherever it happened to be last
+  // baked into the HTML, out of sync with the font actually in use. Now it
+  // is re-synced on every load, right after DOM is parsed.
+  document.addEventListener('DOMContentLoaded', function(){ _markActiveFontOption(key); });
 })();
 
 function getShop(){ return localStorage.getItem('custom_shop_name')||'Piarey Bhai Traders'; }
@@ -2998,9 +2995,9 @@ function ncMakeDrop(dropId, items){
     div.dataset.p = c.phone;
     div.dataset.ex = c.existing ? '1' : '0';
     div.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 13px;cursor:pointer;border-bottom:1px solid #f1f5f9;background:#fff';
-    div.innerHTML = '<span style="font-size:12.5px;font-weight:800;color:#1e3a8a;font-family:Arial,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1 1 auto;min-width:0">'
+    div.innerHTML = '<span style="font-size:12.5px;font-weight:800;color:#1e3a8a;font-family:var(--appfont);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1 1 auto;min-width:0">'
       + c.name + '</span>'
-      + '<span style="font-size:11.5px;color:#64748b;direction:ltr;font-family:Arial,sans-serif;flex-shrink:0">'
+      + '<span style="font-size:11.5px;color:#64748b;direction:ltr;font-family:var(--appfont);flex-shrink:0">'
       + (c.phone||'—') + '</span>';
     div.addEventListener('touchstart',  function(){ div.style.background='#eff6ff'; });
     div.addEventListener('mouseover',   function(){ div.style.background='#eff6ff'; });
@@ -4024,6 +4021,11 @@ function restoreData(e){
 }
 
 // Shared logic: reads a File/Blob, validates it, restores it into the app.
+// FIX: local backups save the raw records ARRAY directly, but Google Drive
+// backups save an OBJECT wrapper ({exportedAt, appVersion, recordCount,
+// records:[...]})  — restoring a Drive file used to always fail with
+// "Wrong file!" because this only ever accepted a plain array. Now it
+// accepts EITHER shape.
 function pkApplyRestoreFile(file){
   if(!file.name.endsWith('.json')){
     alert('Choose only a .json file created by Piara Khata!'); return;
@@ -4032,10 +4034,17 @@ function pkApplyRestoreFile(file){
   reader.onload = ev => {
     try{
       const parsed = JSON.parse(ev.target.result);
-      if(!Array.isArray(parsed)) throw new Error('Invalid format');
-      localStorage.setItem('easyKhataData', ev.target.result);
+      var arr;
+      if (Array.isArray(parsed)) {
+        arr = parsed; // local backup format
+      } else if (parsed && Array.isArray(parsed.records)) {
+        arr = parsed.records; // Google Drive backup format (wrapped object)
+      } else {
+        throw new Error('Invalid format');
+      }
+      localStorage.setItem('easyKhataData', JSON.stringify(arr));
       loadData(); renderStats(); renderList();
-      showRestoreDoneModal(parsed.length, file.name);
+      showRestoreDoneModal(arr.length, file.name);
     } catch(err){
       alert('Wrong file! Choose only a JSON file created by Piara Khata.');
     }
@@ -5339,7 +5348,7 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
   margin: 0;
   font-size: 20px;
   color: #1f2937;
-  font-family: Arial, sans-serif;
+  font-family: var(--appfont);
 }
 
 .contact-modal-close {
@@ -5362,7 +5371,7 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
   border: 2px solid #e5e7eb;
   border-radius: 8px;
   font-size: 16px;
-  font-family: Arial, sans-serif;
+  font-family: var(--appfont);
 }
 
 .contact-list {
@@ -5397,7 +5406,7 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
   font-size: 14px;
   margin-top: 4px;
   direction: ltr;
-  font-family: Arial, sans-serif;
+  font-family: var(--appfont);
 }
 
 .contact-no-results {
@@ -5447,7 +5456,7 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
   font-size: 13px;
   margin-top: 3px;
   direction: ltr;
-  font-family: Arial, sans-serif;
+  font-family: var(--appfont);
 }
 
 .contact-suggestion-no-result {
@@ -5455,7 +5464,7 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
   text-align: center;
   color: #d1d5db;
   font-size: 14px;
-  font-family: Arial, sans-serif;
+  font-family: var(--appfont);
 }
 </style>
 
@@ -5877,7 +5886,7 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
   updateNetStatus();
 
   // 3) App version tag (shown under the Online/Offline indicator)
-  var PK_APP_VERSION = 'PK258TU0445PM';
+  var PK_APP_VERSION = 'PK258MO01';
   document.addEventListener('DOMContentLoaded', function(){
     var v = document.getElementById('pk-app-version');
     if (v) v.textContent = PK_APP_VERSION;
@@ -6181,6 +6190,19 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
           console.log('Piara Khata cloud: Drive OAuth error —', err);
           pkDriveBusy = false;
           var reason = (err && err.type) ? err.type : 'گوگل اجازت میں خرابی';
+          // FIX: "disallowed_useragent" means Google refused to show its
+          // sign-in screen because this page is running inside an embedded
+          // app webview instead of a real browser tab — Google blocks
+          // sign-in there on purpose. That is why the account picker can
+          // reappear every single time (Google never remembers the session)
+          // and why the Drive folder link can show a bare response instead
+          // of the real page. Show this in plain Urdu instead of failing
+          // silently, so it's clear this isn't an in-app bug to keep
+          // retrying — the app needs to be opened in a real browser tab
+          // (e.g. Chrome) rather than inside a wrapped webview.
+          if (reason === 'disallowed_useragent'){
+            reason = 'گوگل سائن ان اس ایپ کے اندرونی ویب ویو میں مسدود ہے — براہ کرم یہ ایپ اصل Chrome براؤزر میں کھولیں';
+          }
           pkSaveDriveStatus('failed', reason);
         }
       });
@@ -6523,12 +6545,36 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
       .catch(function(e){ alert('فائل ڈاؤن لوڈ نہیں ہو سکی: ' + (e && e.message)); });
   };
 
+  // Opens a URL in the SYSTEM browser rather than staying inside this
+  // app's own webview. FIX for "tapping the Drive folder just shows raw
+  // code": window.open(url,'_blank') alone often stays trapped inside an
+  // embedded webview (if this app is wrapped as an Android/iOS app), and
+  // Google deliberately blocks/serves a bare response page for Drive &
+  // sign-in pages opened inside an embedded webview instead of a real
+  // browser tab — that raw response is the "code" you were seeing. A real
+  // <a target="_blank" rel="noopener"> click is what lets a wrapper app
+  // correctly hand the link off to Chrome/Safari.
+  function pkOpenExternalUrl(url){
+    try{
+      var a = document.createElement('a');
+      a.href = url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }catch(e){
+      try{ window.open(url, '_blank', 'noopener,noreferrer'); }
+      catch(e2){ window.location.href = url; }
+    }
+  }
+
   // Opens the actual Drive folder in the browser — used by the tappable
   // Google Drive element on the home screen.
   window.pkOpenDriveFolder = function(){
     var id = pkDriveFolderId || localStorage.getItem('pk_drive_folder_id');
     if (id && id !== 'undefined' && id !== 'null'){
-      window.open('https://drive.google.com/drive/folders/' + id, '_blank');
+      pkOpenExternalUrl('https://drive.google.com/drive/folders/' + id);
     } else {
       // Folder not known yet on this device — trigger a Drive backup first,
       // which creates/looks up the folder, then open it.
