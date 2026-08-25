@@ -1152,9 +1152,11 @@ select {
   </div>
 
   <!-- GOOGLE DRIVE BACKUP STATUS BAR (always shows what happened — success or failure) -->
-  <div id="pk-drive-status-bar" class="no-print" style="display:none;margin:6px 12px 0 12px;border-radius:8px;padding:4px 8px;align-items:center;gap:6px;direction:rtl">
-    <span style="font-size:9px;font-weight:900">☁️</span>
-    <span id="pk-drive-status-text" style="font-size:10px;font-weight:800;flex:1"></span>
+  <!-- GOOGLE DRIVE BACKUP STATUS TOAST — small, auto-disappears after a few
+       seconds, never sticks on screen permanently or blocks content. -->
+  <div id="pk-drive-status-bar" class="no-print" style="display:none;position:fixed;top:14px;left:50%;transform:translateX(-50%) translateY(-14px);border-radius:22px;padding:8px 18px;align-items:center;gap:6px;direction:rtl;z-index:99999997;box-shadow:0 4px 16px rgba(0,0,0,.25);max-width:88%;opacity:0;transition:opacity .35s ease, transform .35s ease;pointer-events:none">
+    <span style="font-size:12px;font-weight:900">☁️</span>
+    <span id="pk-drive-status-text" style="font-size:12px;font-weight:800"></span>
   </div>
 
   <!-- STATS -->
@@ -5861,7 +5863,7 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
   updateNetStatus();
 
   // 3) App version tag (shown under the Online/Offline indicator)
-  var PK_APP_VERSION = 'PK258TU0712AM';
+  var PK_APP_VERSION = 'PK258TU0805AM';
   document.addEventListener('DOMContentLoaded', function(){
     var v = document.getElementById('pk-app-version');
     if (v) v.textContent = PK_APP_VERSION;
@@ -5944,7 +5946,37 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
   var pkDriveFolderId = null;
   var pkDriveBusy = false;
 
-  // ── visual: green progress bar (right → left, then fades) ──
+  // ── visual: thin green progress bar, now synced to the ACTUAL backup
+  // process instead of a fixed 1.4s animation. pkProgressStart() creeps the
+  // bar forward slowly while we wait on the network; pkProgressFinish()
+  // snaps it to 100% the instant the real result (success/failure) is known,
+  // then fades it out. ──
+  function pkProgressStart(){
+    try{
+      var bar = document.getElementById('pk-backup-bar');
+      if(!bar) return;
+      bar.classList.remove('show');
+      bar.style.transition = 'none';
+      bar.style.width = '0%';
+      void bar.offsetWidth; // force reflow so the transition actually animates
+      bar.classList.add('show');
+      bar.style.transition = 'width 6s cubic-bezier(0.15,0.7,0.85,1)';
+      bar.style.width = '82%'; // creeps toward — but never quite reaches — 100% while waiting
+    }catch(e){}
+  }
+  function pkProgressFinish(){
+    try{
+      var bar = document.getElementById('pk-backup-bar');
+      if(!bar) return;
+      bar.style.transition = 'width .35s ease-out';
+      bar.style.width = '100%';
+      setTimeout(function(){
+        bar.classList.remove('show');
+        setTimeout(function(){ bar.style.width = '0%'; }, 500);
+      }, 450);
+    }catch(e){}
+  }
+  // kept for any other callers — just runs the old fixed-timing version
   function pkShowBackupBar(){
     try{
       var bar = document.getElementById('pk-backup-bar');
@@ -5977,41 +6009,63 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
     }catch(e){}
   }
 
-  // ── visible, persistent Drive-backup status line (always updated —
-  // success AND failure — so nothing fails silently anymore) ──
+  // ── small Drive-backup status TOAST — pops up live while something is
+  // actually happening, then fades away on its own. It does NOT stay stuck
+  // on screen, and it does NOT reappear on every app open showing an old
+  // stale result — it only shows in real time when a backup is attempted. ──
+  var pkDriveStatusHideTimer = null;
   function pkSaveDriveStatus(status, detail){
     try{
       localStorage.setItem('pk_drive_last_status', JSON.stringify({status:status, detail:detail||'', time:Date.now()}));
     }catch(e){}
-    pkRenderDriveStatusBar();
+    pkRenderDriveStatusBar(status, detail);
   }
-  function pkRenderDriveStatusBar(){
+  function pkRenderDriveStatusBar(status, detail){
     try{
       var bar = document.getElementById('pk-drive-status-bar');
       var txt = document.getElementById('pk-drive-status-text');
       if(!bar || !txt) return;
-      var raw = localStorage.getItem('pk_drive_last_status');
-      if(!raw){ bar.style.display='none'; return; }
-      var info = JSON.parse(raw);
-      var d = new Date(info.time);
-      var timeStr = String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
-      bar.style.display = 'flex';
-      if(info.status === 'running'){
+      if (pkDriveStatusHideTimer){ clearTimeout(pkDriveStatusHideTimer); pkDriveStatusHideTimer = null; }
+
+      if(status === 'running'){
         bar.style.background = '#fef9c3'; bar.style.border = '1px solid #fde68a';
         txt.style.color = '#92400e';
-        txt.textContent = 'گوگل ڈرائیو بیک اپ ہو رہا ہے...';
-      } else if(info.status === 'done'){
+        txt.textContent = 'بیک اپ ہو رہا ہے...';
+      } else if(status === 'done'){
         bar.style.background = '#dcfce7'; bar.style.border = '1px solid #bbf7d0';
         txt.style.color = '#166534';
-        txt.textContent = '✅ بیک اپ ہو گیا — "Piara Khata Backups" فولڈر میں — ' + timeStr;
+        txt.textContent = '✅ بیک اپ ہو گیا';
       } else {
         bar.style.background = '#fee2e2'; bar.style.border = '1px solid #fecaca';
         txt.style.color = '#991b1b';
-        txt.textContent = '❌ بیک اپ ناکام — ' + (info.detail || 'وجہ معلوم نہیں') + ' — ' + timeStr;
+        txt.textContent = '❌ بیک اپ نہیں ہو سکا';
+      }
+
+      bar.style.display = 'flex';
+      bar.style.transition = 'none';
+      bar.style.opacity = '0';
+      bar.style.transform = 'translateX(-50%) translateY(-14px)';
+      void bar.offsetWidth; // force reflow so the transition plays
+      bar.style.transition = 'opacity .35s ease, transform .35s ease';
+      bar.style.opacity = '1';
+      bar.style.transform = 'translateX(-50%) translateY(0)';
+
+      // "running" stays up while the backup is in progress (caller replaces
+      // it with done/failed when finished); done/failed auto-fade shortly after.
+      if (status !== 'running'){
+        var visibleFor = (status === 'done') ? 2600 : 4200;
+        pkDriveStatusHideTimer = setTimeout(function(){
+          bar.style.opacity = '0';
+          bar.style.transform = 'translateX(-50%) translateY(-14px)';
+          setTimeout(function(){ bar.style.display = 'none'; }, 400);
+        }, visibleFor);
       }
     }catch(e){}
   }
-  document.addEventListener('DOMContentLoaded', pkRenderDriveStatusBar);
+  // NOTE: deliberately NOT calling pkRenderDriveStatusBar() on page load —
+  // it should only ever appear live, in real time, while a backup is
+  // actually running/finishing. Showing an old cached result every time the
+  // app opens was exactly the confusing, alarming behavior we're fixing.
 
   function pkTodayStr(){
     var d = new Date();
@@ -6239,7 +6293,7 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
     if (!pkTokenClient) { console.log('Piara Khata cloud: Drive not configured yet (missing Client ID)'); pkSaveDriveStatus('failed','گوگل کی سروس ابھی لوڈ نہیں ہوئی — انٹرنیٹ سست ہے، تھوڑی دیر بعد دوبارہ کوشش کریں'); if(manual) alert('گوگل ڈرائیو سروس ابھی لوڈ ہو رہی ہے (سست انٹرنیٹ کی وجہ سے) — چند سیکنڈ بعد دوبارہ کوشش کریں'); return; }
     pkDriveBusy = true;
     pkSaveDriveStatus('running');
-    pkShowBackupBar();
+    pkProgressStart();
     // safety valve: if the OAuth callback never fires for any reason,
     // don't let pkDriveBusy stay stuck "true" forever (this used to block
     // every future attempt — including the twice-daily silent ones —
@@ -6247,10 +6301,11 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
     var watchdog = setTimeout(function(){
       if (pkDriveBusy){
         pkDriveBusy = false;
+        pkProgressFinish();
         pkSaveDriveStatus('failed','ٹائم آؤٹ — گوگل کی طرف سے کوئی جواب نہیں آیا');
       }
     }, 25000);
-    function finish(){ clearTimeout(watchdog); }
+    function finish(){ clearTimeout(watchdog); pkProgressFinish(); }
     pkGetDriveToken(function(token){
       if (!token){ finish(); pkDriveBusy = false; pkSaveDriveStatus('failed','گوگل اکاؤنٹ سے رابطہ نہیں ہو سکا (اجازت نہیں ملی)'); if(manual) alert('گوگل اکاؤنٹ سے رابطہ نہیں ہو سکا'); return; }
       pkGetOrCreateFolder(token, function(folderId, err){
@@ -6258,7 +6313,7 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
         pkUploadBackupFile(token, folderId, function(ok, err2){
           finish();
           pkDriveBusy = false;
-          if (ok){ pkSaveDriveStatus('done'); pkShowBackupToast(); }
+          if (ok){ pkSaveDriveStatus('done'); }
           else { pkSaveDriveStatus('failed', err2 || 'اپلوڈ ناکام'); if(manual) alert('گوگل ڈرائیو بیک اپ ناکام ہوگیا: '+(err2||'دوبارہ کوشش کریں')); }
         });
       });
