@@ -5861,7 +5861,7 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
   updateNetStatus();
 
   // 3) App version tag (shown under the Online/Offline indicator)
-  var PK_APP_VERSION = 'PK258TU0706AM';
+  var PK_APP_VERSION = 'PK258TU0712AM';
   document.addEventListener('DOMContentLoaded', function(){
     var v = document.getElementById('pk-app-version');
     if (v) v.textContent = PK_APP_VERSION;
@@ -6231,7 +6231,12 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
   function pkRunDriveBackup(manual){
     if (!navigator.onLine){ pkSaveDriveStatus('failed','انٹرنیٹ کنکشن نہیں'); if(manual) alert('انٹرنیٹ کنکشن نہیں — گوگل ڈرائیو بیک اپ کے لیے انٹرنیٹ ضروری ہے'); return; }
     if (pkDriveBusy) return;
-    if (!pkTokenClient) { console.log('Piara Khata cloud: Drive not configured yet (missing Client ID)'); pkSaveDriveStatus('failed','گوگل ڈرائیو سیٹ اپ نہیں (Client ID/GIS لوڈ نہیں ہوا)'); if(manual) alert('گوگل ڈرائیو ابھی سیٹ اپ نہیں ہوئی'); return; }
+    if (!pkTokenClient) {
+      // one more attempt right now, in case GIS finished loading in the
+      // background since the last retry check (slow connections)
+      pkInitDriveTokenClient();
+    }
+    if (!pkTokenClient) { console.log('Piara Khata cloud: Drive not configured yet (missing Client ID)'); pkSaveDriveStatus('failed','گوگل کی سروس ابھی لوڈ نہیں ہوئی — انٹرنیٹ سست ہے، تھوڑی دیر بعد دوبارہ کوشش کریں'); if(manual) alert('گوگل ڈرائیو سروس ابھی لوڈ ہو رہی ہے (سست انٹرنیٹ کی وجہ سے) — چند سیکنڈ بعد دوبارہ کوشش کریں'); return; }
     pkDriveBusy = true;
     pkSaveDriveStatus('running');
     pkShowBackupBar();
@@ -6290,8 +6295,26 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
 
   document.addEventListener('DOMContentLoaded', function(){
     pkInitFirebase();
-    // give the GIS script a moment to load before wiring the token client
-    setTimeout(pkInitDriveTokenClient, 800);
+    // FIX: on slow connections (e.g. spotty mobile data), the Google Identity
+    // Services script can take much longer than 800ms to load. Before, we
+    // only checked ONCE at 800ms and gave up forever if it wasn't ready yet
+    // — permanently showing "گوگل ڈرائیو ابھی سیٹ اپ نہیں ہوئی" even though
+    // nothing was actually wrong, it just needed more time. Now we keep
+    // retrying every second (up to 30 tries / 30 seconds) until the script
+    // is actually available.
+    var pkGisAttempts = 0;
+    (function pkWaitForGis(){
+      pkGisAttempts++;
+      if (typeof google !== 'undefined' && google.accounts && google.accounts.oauth2){
+        pkInitDriveTokenClient();
+        return;
+      }
+      if (pkGisAttempts < 30){
+        setTimeout(pkWaitForGis, 1000);
+      } else {
+        console.log('Piara Khata cloud: Google Identity Services script never loaded (checked for 30s) — likely blocked or no internet');
+      }
+    })();
     setTimeout(pkCheckScheduledBackups, 1200);
   });
 
