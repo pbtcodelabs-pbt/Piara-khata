@@ -2,7 +2,7 @@
 // Cache name is tied to the app version (PK_APP_VERSION in index.html).
 // Bump CACHE_NAME every time you bump PK_APP_VERSION so old caches are cleared automatically.
 
-const CACHE_NAME = 'piara-khata-cache-PK258TU0625AM';
+const CACHE_NAME = 'piara-khata-cache-PK258TU0643AM';
 
 const PRECACHE_URLS = [
   './',

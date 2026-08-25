@@ -1115,7 +1115,7 @@ select {
       <button onclick="showMyAds()" style="background:linear-gradient(135deg,#ffd700,#ff8c00);color:#1a0a00;border:none;border-radius:16px;padding:7px 14px;font-size:13px;font-weight:900;cursor:pointer;display:flex;align-items:center;gap:5px;box-shadow:0 3px 0 #a05a00">
         <span>📢</span><span>My Ads</span>
       </button>
-      <div id="pk-app-version">PK258TU0625AM</div>
+      <div id="pk-app-version">PK258TU0643AM</div>
       <div style="display:flex;gap:5px">
         <button onclick="printAllReport()" style="background:rgba(255,255,255,.25);border:1.5px solid rgba(255,255,255,.5);color:#fff;padding:7px 14px;border-radius:16px;font-size:13px;font-weight:900;cursor:pointer">🖨️ Report</button>
         <button onclick="toggleSettingsMenu()" id="settings-toggle-btn" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);color:#fff;width:30px;height:30px;border-radius:50%;font-size:16px;font-weight:900;cursor:pointer">⚙️</button>
@@ -2202,8 +2202,11 @@ async function initLock(){
         }
         const expectedActCs = _makeChecksum('ACT::'+fp, actTs);
         const elapsedDays = (Date.now() - actTs) / 86400000;
-        
-        if(actCs === expectedActCs && elapsedDays < 365){
+        // plan duration in days (1M=30, 3M=90, 6M=180, 12M=365) — defaults to 365 for
+        // older activations / dev bypass that never stored a plan length
+        const planDays = parseInt(localStorage.getItem('ek_act_days')||'365');
+
+        if(actCs === expectedActCs && elapsedDays < planDays){
           showApp(); return; // ✅ activation valid
         }
       } catch(e) {
@@ -2263,10 +2266,10 @@ async function initLock(){
 }
 
 function _clearTrialData(){
-  ['ek_ts','ek_cs','ek_fp','ek_act','ek_act_ts','ek_act_cs'].forEach(k=>localStorage.removeItem(k));
+  ['ek_ts','ek_cs','ek_fp','ek_act','ek_act_ts','ek_act_cs','ek_act_days'].forEach(k=>localStorage.removeItem(k));
 }
 function _clearActivationData(){
-  ['ek_act','ek_act_ts','ek_act_cs'].forEach(k=>localStorage.removeItem(k));
+  ['ek_act','ek_act_ts','ek_act_cs','ek_act_days'].forEach(k=>localStorage.removeItem(k));
 }
 
 function showApp(){
@@ -2349,14 +2352,29 @@ async function startTrial(){
 async function tryUnlock(){
   const fp = await getDeviceFingerprint();
   const uid = parseInt(fp) || parseInt(localStorage.getItem('ek_uid')||'0');
-  const expected = uid * 10 + 1976;
+
+  // Multiple subscription plans — each plan has its own formula & duration (days)
+  // 1M -> UID*10+1976 -> 30 days
+  // 3M -> UID*10+1977 -> 90 days
+  // 6M -> UID*10+1978 -> 180 days
+  // 12M -> UID*10+1979 -> 365 days
+  const PLANS = [
+    { code: uid*10+1976, days: 30  },
+    { code: uid*10+1977, days: 90  },
+    { code: uid*10+1978, days: 180 },
+    { code: uid*10+1979, days: 365 }
+  ];
+
   const entered = parseInt(document.getElementById('activation-key').value||'0');
-  if(entered === expected){
+  const matched = PLANS.find(p => p.code === entered);
+
+  if(matched){
     const ts = Date.now();
     localStorage.setItem('ek_act','YES');
     localStorage.setItem('ek_uid', fp);
     localStorage.setItem('ek_act_ts', _encodeTime(ts));
     localStorage.setItem('ek_act_cs', _makeChecksum('ACT::'+fp, ts));
+    localStorage.setItem('ek_act_days', String(matched.days)); // remember plan duration
     document.getElementById('key-error').style.display='none';
     showApp();
   } else {
@@ -5837,7 +5855,7 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
   updateNetStatus();
 
   // 3) App version tag (shown under the Online/Offline indicator)
-  var PK_APP_VERSION = 'PK258TU0625AM';
+  var PK_APP_VERSION = 'PK258TU0643AM';
   document.addEventListener('DOMContentLoaded', function(){
     var v = document.getElementById('pk-app-version');
     if (v) v.textContent = PK_APP_VERSION;
