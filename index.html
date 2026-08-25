@@ -1151,6 +1151,12 @@ select {
     <button onclick="pkCopyLastBackupName()" style="flex-shrink:0;background:#2563eb;color:#fff;border:none;border-radius:6px;padding:4px 8px;font-size:9px;font-weight:900;cursor:pointer">📋 کاپی</button>
   </div>
 
+  <!-- GOOGLE DRIVE BACKUP STATUS BAR (always shows what happened — success or failure) -->
+  <div id="pk-drive-status-bar" class="no-print" style="display:none;margin:6px 12px 0 12px;border-radius:8px;padding:4px 8px;align-items:center;gap:6px;direction:rtl">
+    <span style="font-size:9px;font-weight:900">☁️</span>
+    <span id="pk-drive-status-text" style="font-size:10px;font-weight:800;flex:1"></span>
+  </div>
+
   <!-- STATS -->
   <div class="stats no-print">
     <div class="stat-box credit" onclick="setFilter('credit')">
@@ -5855,7 +5861,7 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
   updateNetStatus();
 
   // 3) App version tag (shown under the Online/Offline indicator)
-  var PK_APP_VERSION = 'PK258TU0643AM';
+  var PK_APP_VERSION = 'PK258TU0706AM';
   document.addEventListener('DOMContentLoaded', function(){
     var v = document.getElementById('pk-app-version');
     if (v) v.textContent = PK_APP_VERSION;
@@ -5971,6 +5977,42 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
     }catch(e){}
   }
 
+  // ── visible, persistent Drive-backup status line (always updated —
+  // success AND failure — so nothing fails silently anymore) ──
+  function pkSaveDriveStatus(status, detail){
+    try{
+      localStorage.setItem('pk_drive_last_status', JSON.stringify({status:status, detail:detail||'', time:Date.now()}));
+    }catch(e){}
+    pkRenderDriveStatusBar();
+  }
+  function pkRenderDriveStatusBar(){
+    try{
+      var bar = document.getElementById('pk-drive-status-bar');
+      var txt = document.getElementById('pk-drive-status-text');
+      if(!bar || !txt) return;
+      var raw = localStorage.getItem('pk_drive_last_status');
+      if(!raw){ bar.style.display='none'; return; }
+      var info = JSON.parse(raw);
+      var d = new Date(info.time);
+      var timeStr = String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+      bar.style.display = 'flex';
+      if(info.status === 'running'){
+        bar.style.background = '#fef9c3'; bar.style.border = '1px solid #fde68a';
+        txt.style.color = '#92400e';
+        txt.textContent = 'گوگل ڈرائیو بیک اپ ہو رہا ہے...';
+      } else if(info.status === 'done'){
+        bar.style.background = '#dcfce7'; bar.style.border = '1px solid #bbf7d0';
+        txt.style.color = '#166534';
+        txt.textContent = '✅ بیک اپ ہو گیا — "Piara Khata Backups" فولڈر میں — ' + timeStr;
+      } else {
+        bar.style.background = '#fee2e2'; bar.style.border = '1px solid #fecaca';
+        txt.style.color = '#991b1b';
+        txt.textContent = '❌ بیک اپ ناکام — ' + (info.detail || 'وجہ معلوم نہیں') + ' — ' + timeStr;
+      }
+    }catch(e){}
+  }
+  document.addEventListener('DOMContentLoaded', pkRenderDriveStatusBar);
+
   function pkTodayStr(){
     var d = new Date();
     return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
@@ -6050,7 +6092,18 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
       pkTokenClient = google.accounts.oauth2.initTokenClient({
         client_id: GOOGLE_DRIVE_CLIENT_ID,
         scope: DRIVE_SCOPE,
-        callback: '' // set dynamically per request below
+        callback: '', // set dynamically per request below
+        error_callback: function(err){
+          // THIS was missing before — without it, if the OAuth popup fails,
+          // gets blocked, is closed by the user, or Google returns an error
+          // (invalid origin, access_denied, popup_closed, etc.), NOTHING
+          // happened: no callback fired, no error shown, pkDriveBusy stayed
+          // stuck "true" forever, silently blocking every future attempt.
+          console.log('Piara Khata cloud: Drive OAuth error —', err);
+          pkDriveBusy = false;
+          var reason = (err && err.type) ? err.type : 'گوگل اجازت میں خرابی';
+          pkSaveDriveStatus('failed', reason);
+        }
       });
     }catch(e){
       console.log('Piara Khata cloud: Drive token client init failed —', e && e.message);
@@ -6095,6 +6148,11 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
     pkDriveApi(token, "https://www.googleapis.com/drive/v3/files?q=" + q + "&fields=files(id,name)")
       .then(function(r){ return r.json(); })
       .then(function(data){
+        if (data.error){
+          console.log('Piara Khata cloud: folder lookup API error —', data.error);
+          cb(null, data.error.message || ('Drive error ' + data.error.code));
+          return;
+        }
         if (data.files && data.files.length){
           pkDriveFolderId = data.files[0].id;
           localStorage.setItem('pk_drive_folder_id', pkDriveFolderId);
@@ -6107,14 +6165,19 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
           })
             .then(function(r){ return r.json(); })
             .then(function(folder){
+              if (folder.error){
+                console.log('Piara Khata cloud: folder create API error —', folder.error);
+                cb(null, folder.error.message || ('Drive error ' + folder.error.code));
+                return;
+              }
               pkDriveFolderId = folder.id;
               localStorage.setItem('pk_drive_folder_id', pkDriveFolderId);
               cb(pkDriveFolderId);
             })
-            .catch(function(e){ console.log('Piara Khata cloud: folder create failed —', e && e.message); cb(null); });
+            .catch(function(e){ console.log('Piara Khata cloud: folder create failed —', e && e.message); cb(null, e && e.message); });
         }
       })
-      .catch(function(e){ console.log('Piara Khata cloud: folder lookup failed —', e && e.message); cb(null); });
+      .catch(function(e){ console.log('Piara Khata cloud: folder lookup failed —', e && e.message); cb(null, e && e.message); });
   }
 
   // Uploads the backup JSON file straight into the fixed Drive folder.
@@ -6150,31 +6213,48 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
           localStorage.setItem('pk_drive_connected', 'yes');
           onDone(true);
         } else {
+          var msg = (res && res.error && res.error.message) ? res.error.message : 'اپلوڈ کا جواب ناکام';
           console.log('Piara Khata cloud: Drive upload response had no id', res);
-          onDone(false);
+          onDone(false, msg);
         }
       })
       .catch(function(e){
         console.log('Piara Khata cloud: Drive upload failed —', e && e.message);
-        onDone(false);
+        onDone(false, e && e.message);
       });
   }
 
   // Full pipeline: get token → get/create folder → upload file → show confirmation.
+  // FIX: every exit point now updates pk-drive-status-bar (visible on the
+  // home screen) so success AND failure are always shown — not just on
+  // manual clicks, and not silently swallowed by console.log anymore.
   function pkRunDriveBackup(manual){
-    if (!navigator.onLine){ if(manual) alert('انٹرنیٹ کنکشن نہیں — گوگل ڈرائیو بیک اپ کے لیے انٹرنیٹ ضروری ہے'); return; }
+    if (!navigator.onLine){ pkSaveDriveStatus('failed','انٹرنیٹ کنکشن نہیں'); if(manual) alert('انٹرنیٹ کنکشن نہیں — گوگل ڈرائیو بیک اپ کے لیے انٹرنیٹ ضروری ہے'); return; }
     if (pkDriveBusy) return;
-    if (!pkTokenClient) { console.log('Piara Khata cloud: Drive not configured yet (missing Client ID)'); if(manual) alert('گوگل ڈرائیو ابھی سیٹ اپ نہیں ہوئی'); return; }
+    if (!pkTokenClient) { console.log('Piara Khata cloud: Drive not configured yet (missing Client ID)'); pkSaveDriveStatus('failed','گوگل ڈرائیو سیٹ اپ نہیں (Client ID/GIS لوڈ نہیں ہوا)'); if(manual) alert('گوگل ڈرائیو ابھی سیٹ اپ نہیں ہوئی'); return; }
     pkDriveBusy = true;
+    pkSaveDriveStatus('running');
     pkShowBackupBar();
+    // safety valve: if the OAuth callback never fires for any reason,
+    // don't let pkDriveBusy stay stuck "true" forever (this used to block
+    // every future attempt — including the twice-daily silent ones —
+    // with zero indication anything was wrong).
+    var watchdog = setTimeout(function(){
+      if (pkDriveBusy){
+        pkDriveBusy = false;
+        pkSaveDriveStatus('failed','ٹائم آؤٹ — گوگل کی طرف سے کوئی جواب نہیں آیا');
+      }
+    }, 25000);
+    function finish(){ clearTimeout(watchdog); }
     pkGetDriveToken(function(token){
-      if (!token){ pkDriveBusy = false; if(manual) alert('گوگل اکاؤنٹ سے رابطہ نہیں ہو سکا'); return; }
-      pkGetOrCreateFolder(token, function(folderId){
-        if (!folderId){ pkDriveBusy = false; return; }
-        pkUploadBackupFile(token, folderId, function(ok){
+      if (!token){ finish(); pkDriveBusy = false; pkSaveDriveStatus('failed','گوگل اکاؤنٹ سے رابطہ نہیں ہو سکا (اجازت نہیں ملی)'); if(manual) alert('گوگل اکاؤنٹ سے رابطہ نہیں ہو سکا'); return; }
+      pkGetOrCreateFolder(token, function(folderId, err){
+        if (!folderId){ finish(); pkDriveBusy = false; pkSaveDriveStatus('failed', err || 'فولڈر نہیں بن سکا'); if(manual) alert('گوگل ڈرائیو فولڈر نہیں بن سکا: '+(err||'نامعلوم وجہ')); return; }
+        pkUploadBackupFile(token, folderId, function(ok, err2){
+          finish();
           pkDriveBusy = false;
-          if (ok) pkShowBackupToast();
-          else if(manual) alert('گوگل ڈرائیو بیک اپ ناکام ہوگیا، دوبارہ کوشش کریں');
+          if (ok){ pkSaveDriveStatus('done'); pkShowBackupToast(); }
+          else { pkSaveDriveStatus('failed', err2 || 'اپلوڈ ناکام'); if(manual) alert('گوگل ڈرائیو بیک اپ ناکام ہوگیا: '+(err2||'دوبارہ کوشش کریں')); }
         });
       });
     });
