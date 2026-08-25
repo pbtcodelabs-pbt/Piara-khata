@@ -26,7 +26,7 @@
 <style>
 #pk-net-indicator{
   position:relative;
-  margin:6px auto 2px;
+  margin:16px auto 4px;
   z-index:5;
   display:flex;
   flex-direction:column;
@@ -75,9 +75,20 @@
 }
 #pk-app-version{
   font-size:9px;
-  font-weight:700;
-  opacity:.85;
-  letter-spacing:.3px;
+  font-weight:900;
+  letter-spacing:.4px;
+  background:linear-gradient(90deg,#fff9c4 0%,#ffd700 25%,#fff9c4 50%,#ffd700 75%,#fff9c4 100%);
+  background-size:200% auto;
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  color:transparent;
+  animation:pk-version-shine 2.5s linear infinite;
+  filter:drop-shadow(0 0 2px rgba(255,215,0,.5));
+}
+@keyframes pk-version-shine{
+  0%{background-position:0% center}
+  100%{background-position:200% center}
 }
 @keyframes pk-pulse{
   0%{box-shadow:0 0 0 0 rgba(34,197,94,.55)}
@@ -1093,9 +1104,9 @@ select {
         <span id="pk-net-dot"></span>
         <span id="pk-net-text">Online</span>
       </div>
-      <div id="pk-app-version">PK258TU0548AM</div>
+      <div id="pk-app-version">PK258TU0612AM</div>
     </div>
-    <div id="sub-info-bar" style="display: block; margin: -6px -12px 6px; background: linear-gradient(90deg, rgb(30, 58, 138), rgb(37, 99, 235), rgb(29, 78, 216)); border-radius: 0px; padding: 3px 12px; font-size: 9px; font-weight: 800; color: rgb(255, 255, 255); line-height: 1.4; text-align: center; direction: ltr; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 4px;">🔶 Trial Started: 25-07-2026 &nbsp;|&nbsp; Trial Expires: 01-08-2026 &nbsp;|&nbsp; Remaining Days: 5</div>
+    <div id="sub-info-bar" style="display:none"></div>
     <div style="display:flex;align-items:center;justify-content:center;gap:8px">
       <div class="hdr-title">PIARA KHATA</div>
     </div>
@@ -1117,12 +1128,12 @@ select {
     </div>
     <!-- Settings dropdown -->
     <div id="settings-menu" style="display: none; position: absolute; top: 100%; left: 8px; right: 8px; background: rgb(255, 255, 255); border-radius: 14px; box-shadow: rgba(0, 0, 0, 0.25) 0px 8px 30px; z-index: 200; padding: 10px; margin-top: 4px;">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <button onclick="backupData();toggleSettingsMenu()" style="background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9;border-radius:10px;padding:13px 10px;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit">💾 Backup</button>
-        <button onclick="openRestorePicker();toggleSettingsMenu()" style="background:#fff3e0;color:#e65100;border:1px solid #ffe0b2;border-radius:10px;padding:13px 10px;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit">📂 Restore</button>
-
-        <button onclick="openAdminPanel();toggleSettingsMenu()" style="background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;border:none;border-radius:10px;padding:13px 10px;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;box-shadow:0 3px 0 #0a0f1a,0 4px 10px rgba(15,23,42,.5)">🔐 Admin</button>
-        <button onclick="doLogout()" style="background:#ffebee;color:#c62828;border:1px solid #ffcdd2;border-radius:10px;padding:13px 10px;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit">🔒 Log Out</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <button onclick="backupData();toggleSettingsMenu()" style="background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9;border-radius:9px;padding:9px 6px;font-size:12px;font-weight:900;cursor:pointer;font-family:inherit">💾 لوکل بیک اپ</button>
+        <button onclick="pkRunDriveBackup();toggleSettingsMenu()" style="background:#e3f2fd;color:#1565c0;border:1px solid #bbdefb;border-radius:9px;padding:9px 6px;font-size:12px;font-weight:900;cursor:pointer;font-family:inherit">☁️ ڈرائیو بیک اپ</button>
+        <button onclick="openRestorePicker();toggleSettingsMenu()" style="background:#fff3e0;color:#e65100;border:1px solid #ffe0b2;border-radius:9px;padding:9px 6px;font-size:12px;font-weight:900;cursor:pointer;font-family:inherit">📂 Restore</button>
+        <button onclick="openAdminPanel();toggleSettingsMenu()" style="background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;border:none;border-radius:9px;padding:9px 6px;font-size:12px;font-weight:900;cursor:pointer;font-family:inherit;box-shadow:0 3px 0 #0a0f1a,0 4px 10px rgba(15,23,42,.5)">🔐 Admin</button>
+        <button onclick="doLogout()" style="grid-column:1/3;background:#ffebee;color:#c62828;border:1px solid #ffcdd2;border-radius:9px;padding:9px 6px;font-size:12px;font-weight:900;cursor:pointer;font-family:inherit">🔒 Log Out</button>
       </div>
       <div style="margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9">
         <div style="font-size:10px;font-weight:900;color:#94a3b8;margin-bottom:6px;text-align:center;letter-spacing:.4px">🔤 APP FONT STYLE</div>
@@ -1134,15 +1145,15 @@ select {
       </div>
     </div>
     <input type="file" id="restore-file" accept=".json" style="display:none" onchange="restoreData(event)">
-  <div id="trial-timer-bar" style="background: linear-gradient(90deg, rgb(30, 58, 138), rgb(37, 99, 235), rgb(29, 78, 216)); color: rgb(255, 255, 255); text-align: center; padding: 2px 10px; font-size: 10px; font-weight: 800; letter-spacing: 0.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">⏳ Free trial ends in: <span style="font-size:14px;letter-spacing:1px">4d 02:28:11</span> left</div></header>
+  <div id="trial-timer-bar" style="background:rgba(255,255,255,.14); color:rgba(255,255,255,.85); text-align:center; padding:2px 10px; font-size:9px; font-weight:700; letter-spacing:0.2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; border-radius:8px; margin:2px 12px 0;">⏳ Free trial ends in: <span style="font-size:11px;letter-spacing:.5px">4d 02:28:11</span> left</div></header>
 
   <!-- LAST BACKUP INFO BAR -->
-  <div id="last-backup-bar" class="no-print" style="display:none;margin:8px 12px 0 12px;background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:7px 10px;align-items:center;justify-content:space-between;gap:8px;direction:rtl">
+  <div id="last-backup-bar" class="no-print" style="display:none;margin:6px 12px 0 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:4px 8px;align-items:center;justify-content:space-between;gap:6px;direction:rtl">
     <div style="display:flex;flex-direction:column;overflow:hidden;flex:1">
-      <span style="font-size:10px;font-weight:900;color:#1d4ed8">💾 آخری بیک اپ</span>
-      <span id="last-backup-name" style="font-size:11px;direction:ltr;color:#334155;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></span>
+      <span style="font-size:9px;font-weight:900;color:#1d4ed8">💾 آخری بیک اپ</span>
+      <span id="last-backup-name" style="font-size:10px;direction:ltr;color:#334155;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></span>
     </div>
-    <button onclick="pkCopyLastBackupName()" style="flex-shrink:0;background:#2563eb;color:#fff;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:900;cursor:pointer">📋 کاپی</button>
+    <button onclick="pkCopyLastBackupName()" style="flex-shrink:0;background:#2563eb;color:#fff;border:none;border-radius:6px;padding:4px 8px;font-size:9px;font-weight:900;cursor:pointer">📋 کاپی</button>
   </div>
 
   <!-- STATS -->
@@ -5872,7 +5883,7 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
   updateNetStatus();
 
   // 3) App version tag (shown under the Online/Offline indicator)
-  var PK_APP_VERSION = 'PK258TU0548AM';
+  var PK_APP_VERSION = 'PK258TU0612AM';
   document.addEventListener('DOMContentLoaded', function(){
     var v = document.getElementById('pk-app-version');
     if (v) v.textContent = PK_APP_VERSION;
@@ -6178,22 +6189,26 @@ textarea.adm-inp{resize:none;height:90px;line-height:1.5}
   }
 
   // Full pipeline: get token → get/create folder → upload file → show confirmation.
-  function pkRunDriveBackup(){
-    if (!navigator.onLine || pkDriveBusy) return;
-    if (!pkTokenClient) { console.log('Piara Khata cloud: Drive not configured yet (missing Client ID)'); return; }
+  function pkRunDriveBackup(manual){
+    if (!navigator.onLine){ if(manual) alert('انٹرنیٹ کنکشن نہیں — گوگل ڈرائیو بیک اپ کے لیے انٹرنیٹ ضروری ہے'); return; }
+    if (pkDriveBusy) return;
+    if (!pkTokenClient) { console.log('Piara Khata cloud: Drive not configured yet (missing Client ID)'); if(manual) alert('گوگل ڈرائیو ابھی سیٹ اپ نہیں ہوئی'); return; }
     pkDriveBusy = true;
     pkShowBackupBar();
     pkGetDriveToken(function(token){
-      if (!token){ pkDriveBusy = false; return; }
+      if (!token){ pkDriveBusy = false; if(manual) alert('گوگل اکاؤنٹ سے رابطہ نہیں ہو سکا'); return; }
       pkGetOrCreateFolder(token, function(folderId){
         if (!folderId){ pkDriveBusy = false; return; }
         pkUploadBackupFile(token, folderId, function(ok){
           pkDriveBusy = false;
           if (ok) pkShowBackupToast();
+          else if(manual) alert('گوگل ڈرائیو بیک اپ ناکام ہوگیا، دوبارہ کوشش کریں');
         });
       });
     });
   }
+  // Expose for the manual "Google Drive Backup" button in the settings menu
+  window.pkRunDriveBackup = function(){ pkRunDriveBackup(true); };
 
   // ═══════════════ TWICE-DAILY SILENT SCHEDULE (no button, ever) ═══════════════
   function pkCheckScheduledBackups(){
